@@ -51,7 +51,6 @@
 
         .search-box { margin:8px 12px; position:relative; }
         .search-box input { width:100%; padding:10px 10px 10px 38px; background:var(--surface2); border:1px solid transparent; border-radius:22px; color:var(--text); font-size:0.9rem; outline:none; }
-        .search-box input:focus { border-color:var(--accent); background:var(--surface); }
         .search-box i { position:absolute; left:14px; top:50%; transform:translateY(-50%); color:var(--text-muted); }
 
         .chat-list { flex-grow:1; overflow-y:auto; }
@@ -89,7 +88,6 @@
         .page { position:absolute; inset:0; background:var(--bg); z-index:6; overflow-y:auto; display:none; }
         .page.show { display:block; }
 
-        /* PROFILE */
         .prof-cover { height:120px; background:linear-gradient(135deg,var(--accent),#6ab0f3); position:relative; }
         .prof-av-wrap { position:relative; margin-top:-40px; margin-left:20px; z-index:10; }
         .prof-av-lg { width:80px; height:80px; border-radius:50%; background:var(--accent); border:4px solid var(--surface); display:flex; align-items:center; justify-content:center; font-size:2rem; font-weight:700; color:white; overflow:hidden; cursor:pointer; background-size:cover; background-position:center; }
@@ -101,7 +99,6 @@
         .pstat { text-align:center; }
         .pstat-num { font-weight:600; font-size:1.15rem; }
         .pstat-lbl { font-size:0.72rem; color:var(--text-muted); }
-
         .gifts-row { display:flex; gap:8px; padding:4px 20px 12px; flex-wrap:wrap; }
         .gift-item { background:var(--surface2); border-radius:12px; padding:8px 12px; font-size:1.5rem; }
 
@@ -136,6 +133,8 @@
         .btn-o { background:transparent; color:var(--accent); }
         .err { color:var(--danger); font-size:0.8rem; text-align:center; margin-top:8px; display:none; }
         .err.show { display:block; }
+        .ok { color:#4caf50; font-size:0.8rem; text-align:center; margin-top:8px; display:none; }
+        .ok.show { display:block; }
 
         .toast { position:fixed; bottom:80px; left:50%; transform:translateX(-50%); background:var(--surface3); color:var(--text); padding:10px 20px; border-radius:24px; font-size:0.85rem; z-index:250; pointer-events:none; border:1px solid var(--border); animation:tIn 0.3s,tOut 0.3s 2.5s forwards; white-space:nowrap; }
         @keyframes tIn { from{opacity:0;transform:translateX(-50%) translateY(10px);} to{opacity:1;transform:translateX(-50%) translateY(0);} }
@@ -150,6 +149,7 @@
 
         .modal-bg { position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:400; display:flex; align-items:flex-end; justify-content:center; }
         .modal-card { background:var(--surface); border-radius:16px 16px 0 0; padding:24px 20px; width:100%; max-width:500px; max-height:75vh; overflow-y:auto; }
+        .modal-card h3 { text-align:center; font-size:1.15rem; font-weight:600; color:var(--text); margin-bottom:16px; }
     </style>
 </head>
 <body class="light">
@@ -159,7 +159,7 @@
     <div class="content">
         <div class="sidebar" id="sidebar"><div class="search-box"><i class="fas fa-search"></i><input type="text" placeholder="Поиск..." id="searchInput"></div><div class="chat-list" id="chatList"></div></div>
         <div class="chat-area" id="chatArea">
-            <div class="empty" id="emptyState"><i class="fas fa-comments" style="font-size:3.5rem;opacity:0.12;"></i><h3>FuruGram</h3><p>Выберите чат</p></div>
+            <div class="empty" id="emptyState"><i class="fas fa-comments" style="font-size:3.5rem;opacity:0.12;"></i><h3>FuruGram</h3><p id="emptyText">Выберите чат</p></div>
             <div class="chat-head" id="chatHead" style="display:none;"><button class="back-btn" onclick="closeChat()"><i class="fas fa-arrow-left"></i></button><div class="avatar sm" id="chatAv">A</div><div><div class="cname" id="chatNm"></div><div style="font-size:0.75rem;color:var(--text-secondary);" id="chatSt"></div></div></div>
             <div class="msgs" id="messages" style="display:none;"></div>
             <div class="input-row" id="inputRow" style="display:none;"><input type="text" placeholder="Сообщение..." id="msgInput"><button class="send-btn" onclick="sendMsg()"><i class="fas fa-paper-plane"></i></button></div>
@@ -169,10 +169,10 @@
         <div class="page" id="settingsPage"></div>
     </div>
     <div class="nav">
-        <button class="ni active" data-p="chats"><i class="fas fa-comments"></i><span>Чаты</span></button>
-        <button class="ni" data-p="contacts"><i class="fas fa-address-book"></i><span>Контакты</span></button>
-        <button class="ni" data-p="settings"><i class="fas fa-cog"></i><span>Настройки</span></button>
-        <button class="ni" data-p="profile"><i class="fas fa-user"></i><span>Профиль</span></button>
+        <button class="ni active" data-p="chats"><i class="fas fa-comments"></i><span id="navChats">Чаты</span></button>
+        <button class="ni" data-p="contacts"><i class="fas fa-address-book"></i><span id="navContacts">Контакты</span></button>
+        <button class="ni" data-p="settings"><i class="fas fa-cog"></i><span id="navSettings">Настройки</span></button>
+        <button class="ni" data-p="profile"><i class="fas fa-user"></i><span id="navProfile">Профиль</span></button>
     </div>
 </div>
 
@@ -181,25 +181,33 @@
         <h2 style="text-align:center;font-size:1.5rem;margin-bottom:4px;">🔐 FuruGram</h2>
         <p style="text-align:center;color:var(--text-secondary);margin-bottom:20px;" id="loginSub">Войдите в аккаунт</p>
         <div class="field"><label>Email</label><input type="email" id="lemail" placeholder="your@email.com"></div>
-        <div class="field" id="nameField" style="display:none;"><label>Имя</label><input type="text" id="lname" placeholder="Ваше имя"></div>
-        <div class="field"><label>Пароль</label><input type="password" id="lpass" placeholder="••••••"></div>
-        <div class="err" id="lerr"></div><div class="ok" id="lok" style="color:#4caf50;font-size:0.8rem;text-align:center;margin-top:8px;display:none;"></div>
+        <div class="field" id="nameField" style="display:none;"><label id="lblName">Имя</label><input type="text" id="lname" placeholder="Ваше имя"></div>
+        <div class="field"><label id="lblPass">Пароль</label><input type="password" id="lpass" placeholder="••••••"></div>
+        <div class="err" id="lerr"></div><div class="ok" id="lok"></div>
         <button class="btn btn-p" id="loginBtn" onclick="handleAuth()">🚀 Войти</button>
         <button class="btn btn-o" id="switchBtn" onclick="toggleMode()">✨ Создать аккаунт</button>
+        <button class="btn btn-o" onclick="switchLang()" style="font-size:0.85rem;">🌐 English</button>
     </div>
 </div>
 
-<div id="createModal" style="display:none;" class="modal-bg"><div class="modal-card"><h3 style="text-align:center;margin-bottom:16px;">✨ Создать</h3><div class="field"><label>Название</label><input type="text" id="cname"></div><button class="btn btn-p" onclick="doCreate('channel')" style="width:100%;">📢 Канал</button><button class="btn" onclick="doCreate('group')" style="width:100%;background:#4caf50;color:white;margin-top:8px;">👥 Группа</button><button class="btn btn-o" onclick="hideCreate()" style="width:100%;">Отмена</button></div></div>
+<div id="createModal" style="display:none;" class="modal-bg"><div class="modal-card"><h3 id="createTitle">✨ Создать</h3><div class="field"><label id="lblCreateName">Название</label><input type="text" id="cname"></div><button class="btn btn-p" onclick="doCreate('channel')" style="width:100%;">📢 <span id="btnChannel">Канал</span></button><button class="btn" onclick="doCreate('group')" style="width:100%;background:#4caf50;color:white;margin-top:8px;">👥 <span id="btnGroup">Группа</span></button><button class="btn btn-o" onclick="hideCreate()" style="width:100%;"><span id="btnCancel">Отмена</span></button></div></div>
 
-<div id="premModal" style="display:none;" class="modal-bg"><div class="modal-card"><h3 style="text-align:center;">⭐ FuruGram Premium</h3><p style="text-align:center;color:var(--text-secondary);margin-bottom:16px;">Эксклюзивные возможности</p><button class="btn" id="actPremBtn" onclick="activatePrem()" style="width:100%;background:linear-gradient(135deg,#d4a843,#f0c860);color:#1a1a2e;font-weight:700;font-size:1rem;padding:15px;">⭐ Активировать бесплатно</button><button class="btn" id="cancelPremBtn" onclick="cancelPrem()" style="width:100%;background:var(--danger);color:white;display:none;margin-top:8px;">Отменить Premium</button><button class="btn btn-o" onclick="hidePrem()" style="width:100%;">Закрыть</button></div></div>
+<div id="premModal" style="display:none;" class="modal-bg"><div class="modal-card"><h3>⭐ FuruGram Premium</h3><p style="text-align:center;color:var(--text-secondary);margin-bottom:16px;" id="premDesc">Эксклюзивные возможности</p><button class="btn" id="actPremBtn" onclick="activatePrem()" style="width:100%;background:linear-gradient(135deg,#d4a843,#f0c860);color:#1a1a2e;font-weight:700;font-size:1rem;padding:15px;">⭐ <span id="btnActivate">Активировать бесплатно</span></button><button class="btn" id="cancelPremBtn" onclick="cancelPrem()" style="width:100%;background:var(--danger);color:white;display:none;margin-top:8px;"><span id="btnCancelPrem">Отменить Premium</span></button><button class="btn btn-o" onclick="hidePrem()" style="width:100%;"><span id="btnClose">Закрыть</span></button></div></div>
 
-<div id="giftShopModal" style="display:none;" class="modal-bg"><div class="modal-card"><h3 style="text-align:center;">🎁 Магазин подарков</h3><p style="text-align:center;color:var(--text-secondary);margin-bottom:14px;">Ваши звёзды: <b id="starsCount">0</b> ⭐</p><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;" id="giftList"></div><button class="btn btn-o" onclick="hideGiftShop()" style="width:100%;margin-top:14px;">Закрыть</button></div></div>
+<div id="giftShopModal" style="display:none;" class="modal-bg"><div class="modal-card"><h3>🎁 <span id="giftTitle">Магазин подарков</span></h3><p style="text-align:center;color:var(--text-secondary);margin-bottom:14px;"><span id="giftStarsLabel">Ваши звёзды:</span> <b id="starsCount">0</b> ⭐</p><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;" id="giftList"></div><button class="btn btn-o" onclick="hideGiftShop()" style="width:100%;margin-top:14px;"><span id="btnCloseGift">Закрыть</span></button></div></div>
 
 <input type="file" id="avatarInput" accept="image/*" style="display:none;">
 
 <script>
 (function(){
-var US='fg24u',DB='fg24d',CH='fg24ch',GR='fg24gr',SS='fg24s',BC=new BroadcastChannel('fg24');
+var US='fg26u',DB='fg26d',CH='fg26ch',GR='fg26gr',SS='fg26s',BC=new BroadcastChannel('fg26');
+var LANG='ru';
+var TR={
+    ru:{chats:'Чаты',contacts:'Контакты',settings:'Настройки',profile:'Профиль',search:'Поиск...',empty:'Выберите чат',message:'Сообщение...',signIn:'Войдите в аккаунт',signInBtn:'Войти',createAcc:'Создать аккаунт',haveAcc:'У меня есть аккаунт',name:'Имя',password:'Пароль',email:'Email',fillFields:'Заполните все поля',invalidEmail:'Некорректный email',shortPass:'Минимум 3 символа',enterName:'Введите имя',emailExists:'Email занят',saveError:'Ошибка сохранения',userTaken:'Занят',create:'Создать',channel:'Канал',group:'Группа',cancel:'Отмена',premDesc:'Эксклюзивные возможности (бесплатно)',activate:'Активировать бесплатно',cancelPrem:'Отменить Premium',premActive:'Активен',premInactive:'Не активен',bio:'Био',phone:'Телефон',logout:'Выйти',info:'Информация',premium:'Premium',notifications:'Уведомления',theme:'Тема',language:'Язык',light:'Светлая',dark:'Тёмная',version:'Версия',cache:'Очистить кэш',cacheDone:'Кэш очищен!',contactAdded:'добавлен!',welcome:'Добро пожаловать!',welcomeBack:'С возвращением!',username:'Юзернейм',avatarUpdated:'Фото обновлено!',premActivated:'Premium активирован!',premCancelled:'Premium отменён',nameUpdated:'Имя обновлено',usernameUpdated:'Юзернейм обновлён',bioUpdated:'Био обновлено',channelCreated:'Канал создан!',groupCreated:'Группа создана!',noContacts:'Нет контактов',noChats:'Нет чатов',startChat:'Начните переписку!',online:'онлайн',today:'Сегодня',gifts:'Подарки',stars:'Звёзды',buyGift:'Купить подарок',giftBought:'Подарок куплен!',notEnoughStars:'Недостаточно звёзд',giftShop:'Магазин подарков',yourStars:'Ваши звёзды:',close:'Закрыть'},
+    en:{chats:'Chats',contacts:'Contacts',settings:'Settings',profile:'Profile',search:'Search...',empty:'Select a chat',message:'Message...',signIn:'Sign in to account',signInBtn:'Sign In',createAcc:'Create Account',haveAcc:'I have an account',name:'Name',password:'Password',email:'Email',fillFields:'Fill all fields',invalidEmail:'Invalid email',shortPass:'Min 3 chars',enterName:'Enter name',emailExists:'Email exists',saveError:'Save error',userTaken:'Taken',create:'Create',channel:'Channel',group:'Group',cancel:'Cancel',premDesc:'Exclusive features (free)',activate:'Activate Free',cancelPrem:'Cancel Premium',premActive:'Active',premInactive:'Inactive',bio:'Bio',phone:'Phone',logout:'Logout',info:'Info',premium:'Premium',notifications:'Notifications',theme:'Theme',language:'Language',light:'Light',dark:'Dark',version:'Version',cache:'Clear cache',cacheDone:'Cache cleared!',contactAdded:'added!',welcome:'Welcome!',welcomeBack:'Welcome back!',username:'Username',avatarUpdated:'Photo updated!',premActivated:'Premium activated!',premCancelled:'Premium cancelled',nameUpdated:'Name updated',usernameUpdated:'Username updated',bioUpdated:'Bio updated',channelCreated:'Channel created!',groupCreated:'Group created!',noContacts:'No contacts',noChats:'No chats',startChat:'Start chatting!',online:'online',today:'Today',gifts:'Gifts',stars:'Stars',buyGift:'Buy Gift',giftBought:'Gift purchased!',notEnoughStars:'Not enough stars',giftShop:'Gift Shop',yourStars:'Your stars:',close:'Close'}
+};
+function t(key){return (TR[LANG]&&TR[LANG][key])?TR[LANG][key]:key;}
+
 function gu(){try{return JSON.parse(localStorage.getItem(US)||'{}');}catch(e){return{};}}
 function su(v){try{localStorage.setItem(US,JSON.stringify(v));return true;}catch(e){return false;}}
 function gd(){try{return JSON.parse(localStorage.getItem(DB)||'{}');}catch(e){return{};}}
@@ -220,28 +228,59 @@ function gid(){return'id'+Date.now()+Math.random().toString(36).substr(2,6);}
 function md(){if(!U)return{contacts:[],messages:{},channels:[],groups:[]};var d=gd();return d[U.id]||{contacts:[],messages:{},channels:[],groups:[]};}
 function smd(v){var d=gd();d[U.id]=v;sd(d);}
 function addContact(cid){var d=md();if(!d.contacts)d.contacts=[];if(d.contacts.indexOf(cid)===-1){d.contacts.push(cid);if(!d.messages)d.messages={};if(!d.messages[cid])d.messages[cid]=[];smd(d);return true;}return false;}
-function generateUsername(name){var base=name.toLowerCase().replace(/[^a-z0-9_]/g,'_').substring(0,10);while(base.length<6)base+='_'+Math.random().toString(36).substr(2,4);if(base.length>12)base=base.substring(0,12);return base;}
+
+// LANGUAGE
+window.switchLang=function(){LANG=LANG==='ru'?'en':'ru';updateAllTexts();localStorage.setItem('fg_lang',LANG);};
+function updateAllTexts(){
+    document.getElementById('loginSub').textContent=t('signIn');
+    document.getElementById('loginBtn').textContent='🚀 '+t('signInBtn');
+    document.getElementById('switchBtn').textContent=isReg?t('haveAcc'):'✨ '+t('createAcc');
+    document.getElementById('lblName').textContent=t('name');
+    document.getElementById('lblPass').textContent=t('password');
+    document.getElementById('emptyText').textContent=t('empty');
+    document.getElementById('msgInput').placeholder=t('message');
+    document.getElementById('searchInput').placeholder=t('search');
+    document.getElementById('navChats').textContent=t('chats');
+    document.getElementById('navContacts').textContent=t('contacts');
+    document.getElementById('navSettings').textContent=t('settings');
+    document.getElementById('navProfile').textContent=t('profile');
+    document.getElementById('createTitle').textContent='✨ '+t('create');
+    document.getElementById('lblCreateName').textContent=t('name');
+    document.getElementById('btnChannel').textContent=t('channel');
+    document.getElementById('btnGroup').textContent=t('group');
+    document.getElementById('btnCancel').textContent=t('cancel');
+    document.getElementById('premDesc').textContent=t('premDesc');
+    document.getElementById('btnActivate').textContent=t('activate');
+    document.getElementById('btnCancelPrem').textContent=t('cancelPrem');
+    document.getElementById('btnClose').textContent=t('close');
+    document.getElementById('giftTitle').textContent=t('giftShop');
+    document.getElementById('giftStarsLabel').textContent=t('yourStars');
+    document.getElementById('btnCloseGift').textContent=t('close');
+    document.getElementById('ht').textContent=page==='chats'?'FuruGram':t(page);
+    if(page==='profile')rp();
+    if(page==='settings')rs();
+}
 
 // AUTH
-window.toggleMode=function(){isReg=!isReg;document.getElementById('loginSub').textContent=isReg?'Создайте аккаунт':'Войдите в аккаунт';document.getElementById('loginBtn').textContent=isReg?'✨ Зарегистрироваться':'🚀 Войти';document.getElementById('switchBtn').textContent=isReg?'У меня есть аккаунт':'✨ Создать аккаунт';document.getElementById('nameField').style.display=isReg?'block':'none';document.getElementById('lerr').classList.remove('show');document.getElementById('lok').style.display='none';};
-window.handleAuth=function(){var email=document.getElementById('lemail').value.trim().toLowerCase();var pass=document.getElementById('lpass').value.trim();var name=document.getElementById('lname').value.trim();var err=document.getElementById('lerr');var ok=document.getElementById('lok');err.classList.remove('show');ok.style.display='none';if(!email||!pass){err.textContent='❌ Заполните все поля';err.classList.add('show');return;}if(!email.includes('@')){err.textContent='❌ Некорректный email';err.classList.add('show');return;}if(pass.length<3){err.textContent='❌ Минимум 3 символа';err.classList.add('show');return;}if(isReg&&!name){err.textContent='❌ Введите имя';err.classList.add('show');return;}var users=gu();if(isReg){if(users[email]){err.textContent='❌ Email занят';err.classList.add('show');return;}var uname=generateUsername(name);users[email]={id:email,name:name,username:uname,password:pass,avatar:'',online:true,premium:false,bio:'',stars:100,gifts:[]};if(!su(users)){err.textContent='❌ Ошибка сохранения';err.classList.add('show');return;}U=users[email];ss(U);ok.textContent='✅ @'+uname;ok.style.display='block';setTimeout(function(){document.getElementById('loginScreen').style.display='none';go('chats');toast('🎉 Добро пожаловать!');},1000);}else{var u=users[email];if(!u){err.textContent='❌ Аккаунт не найден';err.classList.add('show');return;}if(u.password!==pass){err.textContent='❌ Неверный пароль';err.classList.add('show');return;}U=u;U.online=true;su(users);ss(U);ok.textContent='✅ OK';ok.style.display='block';setTimeout(function(){document.getElementById('loginScreen').style.display='none';go('chats');toast('👋 С возвращением!');},400);}};
+window.toggleMode=function(){isReg=!isReg;document.getElementById('loginSub').textContent=isReg?t('createAcc'):t('signIn');document.getElementById('loginBtn').textContent=isReg?'✨ '+t('createAcc'):'🚀 '+t('signInBtn');document.getElementById('switchBtn').textContent=isReg?t('haveAcc'):'✨ '+t('createAcc');document.getElementById('nameField').style.display=isReg?'block':'none';document.getElementById('lerr').classList.remove('show');document.getElementById('lok').classList.remove('show');};
+window.handleAuth=function(){var email=document.getElementById('lemail').value.trim().toLowerCase();var pass=document.getElementById('lpass').value.trim();var name=document.getElementById('lname').value.trim();var err=document.getElementById('lerr');var ok=document.getElementById('lok');err.classList.remove('show');ok.classList.remove('show');if(!email||!pass){err.textContent='❌ '+t('fillFields');err.classList.add('show');return;}if(!email.includes('@')){err.textContent='❌ '+t('invalidEmail');err.classList.add('show');return;}if(pass.length<3){err.textContent='❌ '+t('shortPass');err.classList.add('show');return;}if(isReg&&!name){err.textContent='❌ '+t('enterName');err.classList.add('show');return;}var users=gu();if(isReg){if(users[email]){err.textContent='❌ '+t('emailExists');err.classList.add('show');return;}var uname=email.split('@')[0].replace(/[^a-z0-9_]/g,'_');while(uname.length<5)uname+='_'+Math.random().toString(36).substr(2,3);users[email]={id:email,name:name,username:uname,password:pass,avatar:'',online:true,premium:false,bio:'',stars:100,gifts:[]};if(!su(users)){err.textContent='❌ '+t('saveError');err.classList.add('show');return;}U=users[email];ss(U);ok.textContent='✅ @'+uname;ok.classList.add('show');setTimeout(function(){document.getElementById('loginScreen').style.display='none';go('chats');toast('🎉 '+t('welcome'));},800);}else{var u=users[email];if(!u){err.textContent='❌ '+t('emailExists');err.classList.add('show');return;}if(u.password!==pass){err.textContent='❌ '+t('shortPass');err.classList.add('show');return;}U=u;U.online=true;su(users);ss(U);ok.textContent='✅ OK';ok.classList.add('show');setTimeout(function(){document.getElementById('loginScreen').style.display='none';go('chats');toast('👋 '+t('welcomeBack'));},400);}};
 
 // NAVIGATION
-function go(p){page=p;document.querySelectorAll('.ni').forEach(function(n){n.classList.remove('active');});var ni=document.querySelector('[data-p="'+p+'"]');if(ni)ni.classList.add('active');document.getElementById('sidebar').classList.toggle('hide',p!=='chats');document.getElementById('contactsPage').classList.toggle('show',p==='contacts');document.getElementById('profilePage').classList.toggle('show',p==='profile');document.getElementById('settingsPage').classList.toggle('show',p==='settings');if(p==='chats')rc();if(p==='contacts')rco();if(p==='profile')rp();if(p==='settings')rs();document.getElementById('ht').textContent=p==='chats'?'FuruGram':p==='contacts'?'Контакты':p==='profile'?'Профиль':'Настройки';}
+function go(p){page=p;document.querySelectorAll('.ni').forEach(function(n){n.classList.remove('active');});var ni=document.querySelector('[data-p="'+p+'"]');if(ni)ni.classList.add('active');document.getElementById('sidebar').classList.toggle('hide',p!=='chats');document.getElementById('contactsPage').classList.toggle('show',p==='contacts');document.getElementById('profilePage').classList.toggle('show',p==='profile');document.getElementById('settingsPage').classList.toggle('show',p==='settings');if(p==='chats')rc();if(p==='contacts')rco();if(p==='profile')rp();if(p==='settings')rs();document.getElementById('ht').textContent=p==='chats'?'FuruGram':t(p);}
 document.querySelectorAll('.ni').forEach(function(n){n.addEventListener('click',function(){go(n.dataset.p);});});
 
 // CHATS
-function rc(){if(!U)return;var d=md(),users=gu();var contacts=(d.contacts||[]).map(function(cid){return users[cid];}).filter(Boolean);var el=document.getElementById('chatList');el.innerHTML='';if(contacts.length===0){el.innerHTML='<div style="text-align:center;padding:40px;color:var(--text-secondary);">Нет чатов. Добавьте контакты через поиск.</div>';return;}contacts.forEach(function(c){var div=document.createElement('div');div.className='chat-item'+(active===c.id?' active':'');div.onclick=function(){openChat(c);};div.innerHTML='<div class="avatar">'+(c.avatar?'<img src="'+c.avatar+'">':c.name.charAt(0))+(c.online?'<span class="online-dot"></span>':'')+'</div><div class="cbody"><div class="cname">'+c.name+'</div><div class="cpreview">@'+c.username+'</div></div>';el.appendChild(div);});}
-function openChat(c){active=c.id;document.getElementById('emptyState').style.display='none';document.getElementById('chatHead').style.display='flex';document.getElementById('messages').style.display='flex';document.getElementById('inputRow').style.display='flex';document.getElementById('chatNm').textContent=c.name;document.getElementById('chatAv').innerHTML=c.avatar?'<img src="'+c.avatar+'">':c.name.charAt(0);document.getElementById('chatSt').innerHTML='<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#4caf50;margin-right:4px;"></span>онлайн';document.getElementById('messages').innerHTML='<div class="dsep"><span>Начните переписку!</span></div>';if(window.innerWidth<=768)document.getElementById('sidebar').classList.add('hide');}
+function rc(){if(!U)return;var d=md(),users=gu();var contacts=(d.contacts||[]).map(function(cid){return users[cid];}).filter(Boolean);var el=document.getElementById('chatList');el.innerHTML='';if(contacts.length===0){el.innerHTML='<div style="text-align:center;padding:40px;color:var(--text-secondary);">'+t('noChats')+'</div>';return;}contacts.forEach(function(c){var div=document.createElement('div');div.className='chat-item'+(active===c.id?' active':'');div.onclick=function(){openChat(c);};div.innerHTML='<div class="avatar">'+(c.avatar?'<img src="'+c.avatar+'">':c.name.charAt(0))+(c.online?'<span class="online-dot"></span>':'')+'</div><div class="cbody"><div class="cname">'+c.name+'</div><div class="cpreview">@'+c.username+'</div></div>';el.appendChild(div);});}
+function openChat(c){active=c.id;document.getElementById('emptyState').style.display='none';document.getElementById('chatHead').style.display='flex';document.getElementById('messages').style.display='flex';document.getElementById('inputRow').style.display='flex';document.getElementById('chatNm').textContent=c.name;document.getElementById('chatAv').innerHTML=c.avatar?'<img src="'+c.avatar+'">':c.name.charAt(0);document.getElementById('chatSt').innerHTML='<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#4caf50;margin-right:4px;"></span>'+t('online');renderMsgs();if(window.innerWidth<=768)document.getElementById('sidebar').classList.add('hide');}
 function closeChat(){active=null;document.getElementById('emptyState').style.display='flex';document.getElementById('chatHead').style.display='none';document.getElementById('messages').style.display='none';document.getElementById('inputRow').style.display='none';document.getElementById('sidebar').classList.remove('hide');}
 function sendMsg(){var text=document.getElementById('msgInput').value.trim();if(!text||!active||!U)return;var d=md();if(!d.messages)d.messages={};if(!d.messages[active])d.messages[active]=[];var now=new Date();var time=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');var msg={text:text,time:time,out:true,read:true,sender:U.name};d.messages[active].push(msg);smd(d);document.getElementById('msgInput').value='';renderMsgs();rc();BC.postMessage({type:'msg',from:U.id,to:active,msg:msg,chatType:'personal'});}
-function renderMsgs(){var el=document.getElementById('messages');el.innerHTML='';var dd=document.createElement('div');dd.className='dsep';dd.innerHTML='<span>Сегодня</span>';el.appendChild(dd);var d=md();var msgs=d.messages[active]||[];msgs.forEach(function(m){var div=document.createElement('div');div.className='msg '+(m.out?'out':'in');div.innerHTML='<div class="mbub">'+m.text+'<div class="mtime">'+m.time+'</div></div>';el.appendChild(div);});el.scrollTop=el.scrollHeight;}
+function renderMsgs(){var el=document.getElementById('messages');if(!active)return;el.innerHTML='';var dd=document.createElement('div');dd.className='dsep';dd.innerHTML='<span>'+t('today')+'</span>';el.appendChild(dd);var d=md();var msgs=d.messages&&d.messages[active]?d.messages[active]:[];msgs.forEach(function(m){var div=document.createElement('div');div.className='msg '+(m.out?'out':'in');div.innerHTML='<div class="mbub">'+m.text+'<div class="mtime">'+m.time+'</div></div>';el.appendChild(div);});el.scrollTop=el.scrollHeight;}
 document.getElementById('msgInput').addEventListener('keypress',function(e){if(e.key==='Enter')sendMsg();});
 
 // CONTACTS
-function rco(){if(!U)return;var d=md(),users=gu();var contacts=(d.contacts||[]).map(function(cid){return users[cid];}).filter(Boolean);var el=document.getElementById('contactsPage');el.innerHTML=contacts.length===0?'<div style="text-align:center;padding:40px;color:var(--text-secondary);">Нет контактов</div>':'';contacts.forEach(function(c){var div=document.createElement('div');div.style.cssText='display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--border);cursor:pointer;';div.innerHTML='<div class="avatar sm">'+(c.avatar?'<img src="'+c.avatar+'">':c.name.charAt(0))+'</div><div><div style="font-weight:500;">'+c.name+'</div><div style="font-size:0.8rem;color:var(--text-secondary);">@'+c.username+'</div></div>';div.onclick=function(){go('chats');setTimeout(function(){openChat(c);},100);};el.appendChild(div);});}
+function rco(){if(!U)return;var d=md(),users=gu();var contacts=(d.contacts||[]).map(function(cid){return users[cid];}).filter(Boolean);var el=document.getElementById('contactsPage');el.innerHTML=contacts.length===0?'<div style="text-align:center;padding:40px;color:var(--text-secondary);">'+t('noContacts')+'</div>':'';contacts.forEach(function(c){var div=document.createElement('div');div.style.cssText='display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--border);cursor:pointer;';div.innerHTML='<div class="avatar sm">'+(c.avatar?'<img src="'+c.avatar+'">':c.name.charAt(0))+'</div><div><div style="font-weight:500;">'+c.name+'</div><div style="font-size:0.8rem;color:var(--text-secondary);">@'+c.username+'</div></div>';div.onclick=function(){go('chats');setTimeout(function(){openChat(c);},100);};el.appendChild(div);});}
 
-// PROFILE (FIXED AVATAR)
+// PROFILE
 function rp(){if(!U)return;var el=document.getElementById('profilePage');var d=md();var posts=0;for(var k in d.messages){posts+=d.messages[k].filter(function(x){return x.out;}).length;}
 el.innerHTML=
 '<div class="prof-cover"></div>'+
@@ -250,68 +289,73 @@ el.innerHTML=
 '<div class="prof-name-lg">'+U.name+(U.premium?' <span style="color:var(--premium);">⭐</span>':'')+'</div>'+
 '<div class="prof-uname-lg">@'+U.username+'</div>'+
 (U.bio?'<div style="color:var(--text);font-size:0.9rem;margin-top:6px;">'+U.bio+'</div>':'')+
-'<div class="prof-stats-row"><div class="pstat"><div class="pstat-num">'+(d.contacts||[]).length+'</div><div class="pstat-lbl">контакты</div></div><div class="pstat"><div class="pstat-num">'+posts+'</div><div class="pstat-lbl">сообщения</div></div><div class="pstat"><div class="pstat-num">'+(U.stars||0)+'</div><div class="pstat-lbl">звёзды</div></div></div>'+
+'<div class="prof-stats-row"><div class="pstat"><div class="pstat-num">'+(d.contacts||[]).length+'</div><div class="pstat-lbl">'+t('contacts')+'</div></div><div class="pstat"><div class="pstat-num">'+posts+'</div><div class="pstat-lbl">posts</div></div><div class="pstat"><div class="pstat-num">'+(U.stars||0)+'</div><div class="pstat-lbl">'+t('stars')+'</div></div></div>'+
 '</div>'+
 ((U.gifts||[]).length>0?'<div class="gifts-row">'+(U.gifts||[]).map(function(g){return'<div class="gift-item">'+g+'</div>';}).join('')+'</div>':'')+
-'<div class="psec"><div class="psec-title">Информация</div>'+
-'<div class="pitem" onclick="editF(\'name\')"><i class="fas fa-user"></i>Имя<span class="pv">'+U.name+'</span></div>'+
-'<div class="pitem" onclick="editF(\'username\')"><i class="fas fa-at"></i>Юзернейм<span class="pv">@'+U.username+'</span></div>'+
-'<div class="pitem" onclick="editF(\'bio\')"><i class="fas fa-info-circle"></i>Био<span class="pv">'+(U.bio||'—')+'</span></div>'+
+'<div class="psec"><div class="psec-title">'+t('info')+'</div>'+
+'<div class="pitem" onclick="editF(\'name\')"><i class="fas fa-user"></i>'+t('name')+'<span class="pv">'+U.name+'</span></div>'+
+'<div class="pitem" onclick="editF(\'username\')"><i class="fas fa-at"></i>'+t('username')+'<span class="pv">@'+U.username+'</span></div>'+
+'<div class="pitem" onclick="editF(\'bio\')"><i class="fas fa-info-circle"></i>'+t('bio')+'<span class="pv">'+(U.bio||'—')+'</span></div>'+
 '</div>'+
-'<div class="psec"><div class="psec-title">Premium</div>'+
-'<div class="pitem" onclick="showPrem()"><i class="fas fa-star" style="color:var(--premium);"></i>Premium<span class="pv">'+(U.premium?'Активен':'—')+'</span></div>'+
-'<div class="pitem" onclick="showGiftShop()"><i class="fas fa-gift"></i>Магазин подарков<span class="pv">'+(U.stars||0)+' ⭐</span></div>'+
+'<div class="psec"><div class="psec-title">'+t('premium')+'</div>'+
+'<div class="pitem" onclick="showPrem()"><i class="fas fa-star" style="color:var(--premium);"></i>Premium<span class="pv">'+(U.premium?t('premActive'):t('premInactive'))+'</span></div>'+
+'<div class="pitem" onclick="showGiftShop()"><i class="fas fa-gift"></i>'+t('giftShop')+'<span class="pv">'+(U.stars||0)+' ⭐</span></div>'+
 '</div>'+
-'<div class="psec"><div class="pitem danger" onclick="logout()"><i class="fas fa-sign-out-alt"></i>Выйти</div></div>';
+'<div class="psec"><div class="pitem danger" onclick="logout()"><i class="fas fa-sign-out-alt"></i>'+t('logout')+'</div></div>';
 }
-window.editF=function(field){var labels={name:'Имя',username:'Юзернейм',bio:'Био'};var values={name:U.name,username:U.username,bio:U.bio||''};var nv=prompt(labels[field]+':',values[field]);if(!nv||!nv.trim())return;nv=nv.trim();var users=gu();if(field==='name'){U.name=nv;users[U.id].name=nv;toast('Имя обновлено');}else if(field==='username'){if(nv.length<5||nv.length>15){toast('Юзернейм от 5 до 15 символов');return;}if(!/^[a-z0-9_]+$/.test(nv)){toast('Только латиница, цифры, _');return;}U.username=nv;users[U.id].username=nv;toast('Юзернейм обновлён');}else if(field==='bio'){U.bio=nv;users[U.id].bio=nv;toast('Био обновлено');}su(users);rp();};
+window.editF=function(field){var labels={name:t('name'),username:t('username'),bio:t('bio')};var values={name:U.name,username:U.username,bio:U.bio||''};var nv=prompt(labels[field]+':',values[field]);if(!nv||!nv.trim())return;nv=nv.trim();var users=gu();if(field==='name'){U.name=nv;users[U.id].name=nv;toast(t('nameUpdated'));}else if(field==='username'){if(nv.length<5||nv.length>15){toast('5-15 chars');return;}if(!/^[a-z0-9_]+$/.test(nv)){toast('a-z, 0-9, _');return;}U.username=nv;users[U.id].username=nv;toast(t('usernameUpdated'));}else if(field==='bio'){U.bio=nv;users[U.id].bio=nv;toast(t('bioUpdated'));}su(users);rp();};
 window.logout=function(){U=null;active=null;ss(null);document.getElementById('loginScreen').style.display='flex';document.getElementById('lemail').value='';document.getElementById('lpass').value='';go('chats');};
 
 // SETTINGS
 function rs(){var el=document.getElementById('settingsPage');el.innerHTML=
 '<div class="psec" style="margin-top:0;">'+
-'<div class="sitem" onclick="requestNotification()"><i class="fas fa-bell"></i><div style="flex-grow:1;">Уведомления<div style="font-size:0.75rem;color:var(--text-muted);">Настройка уведомлений</div></div><span class="sv">›</span></div>'+
-'<div class="sitem" onclick="toggleTheme()"><i class="fas fa-palette"></i><div style="flex-grow:1;">Тема<div style="font-size:0.75rem;color:var(--text-muted);" id="themeLabel">Светлая</div></div><span class="sv">›</span></div>'+
-'<div class="sitem" onclick="toast(\'Кэш очищен!\')"><i class="fas fa-broom"></i><div style="flex-grow:1;">Очистить кэш<div style="font-size:0.75rem;color:var(--text-muted);">Освободить место</div></div><span class="sv">›</span></div>'+
-'<div class="sitem"><i class="fas fa-info-circle"></i><div style="flex-grow:1;">Версия<div style="font-size:0.75rem;color:var(--text-muted);">FuruGram v24.0</div></div><span class="sv">24.0</span></div>'+
+'<div class="sitem" onclick="requestNotification()"><i class="fas fa-bell"></i><div style="flex-grow:1;">'+t('notifications')+'</div><span class="sv">›</span></div>'+
+'<div class="sitem" onclick="switchLang()"><i class="fas fa-globe"></i><div style="flex-grow:1;">'+t('language')+'<div style="font-size:0.75rem;color:var(--text-muted);" id="langLabel">'+(LANG==='en'?'English':'Русский')+'</div></div><span class="sv">›</span></div>'+
+'<div class="sitem" onclick="toggleTheme()"><i class="fas fa-palette"></i><div style="flex-grow:1;">'+t('theme')+'<div style="font-size:0.75rem;color:var(--text-muted);" id="themeLabel">'+t('light')+'</div></div><span class="sv">›</span></div>'+
+'</div>'+
+'<div class="psec">'+
+'<div class="sitem" onclick="toast(t(\'cacheDone\'))"><i class="fas fa-broom"></i><div style="flex-grow:1;">'+t('cache')+'</div><span class="sv">›</span></div>'+
+'<div class="sitem"><i class="fas fa-info-circle"></i><div style="flex-grow:1;">'+t('version')+'</div><span class="sv">26.0</span></div>'+
 '</div>';}
-window.toggleTheme=function(){var dm=document.body.classList.toggle('dark');document.getElementById('themeLabel').textContent=dm?'Тёмная':'Светлая';localStorage.setItem('fg_theme',dm?'dark':'light');};
-window.requestNotification=function(){if('Notification' in window){Notification.requestPermission().then(function(p){if(p==='granted'){toast('✅ Уведомления включены');new Notification('FuruGram',{body:'Уведомления работают!'});}else{toast('❌ Уведомления отключены');}});}};
+window.toggleTheme=function(){var dm=document.body.classList.toggle('dark');document.getElementById('themeLabel').textContent=dm?t('dark'):t('light');localStorage.setItem('fg_theme',dm?'dark':'light');};
+window.requestNotification=function(){if('Notification' in window){Notification.requestPermission().then(function(p){if(p==='granted'){toast('✅ ON');new Notification('FuruGram',{body:'Notifications ON!'});}else{toast('❌ OFF');}});}};
 
-// GIFTS (WORKING)
+// GIFTS
 function showGiftShop(){if(!U)return;document.getElementById('giftShopModal').style.display='flex';document.getElementById('starsCount').textContent=U.stars||0;var gl=document.getElementById('giftList');gl.innerHTML='';gifts.forEach(function(g){var div=document.createElement('div');div.style.cssText='background:var(--surface2);border-radius:14px;padding:16px;text-align:center;cursor:pointer;transition:0.2s;border:2px solid transparent;';div.innerHTML='<div style="font-size:2.2rem;">'+g.e+'</div><div style="font-weight:600;margin:6px 0;">'+g.n+'</div><div style="color:var(--premium);font-weight:600;">'+g.p+' ⭐</div>';div.onclick=function(){buyGift(g.e,g.p);};gl.appendChild(div);});}
 function hideGiftShop(){document.getElementById('giftShopModal').style.display='none';}
-function buyGift(emoji,price){if(!U)return;if((U.stars||0)<price){toast('❌ Недостаточно звёзд! Нужно '+price+' ⭐');return;}U.stars=(U.stars||0)-price;if(!U.gifts)U.gifts=[];U.gifts.push(emoji);var users=gu();users[U.id].stars=U.stars;users[U.id].gifts=U.gifts;su(users);rp();showGiftShop();toast('✅ Подарок куплен!');}
+function buyGift(emoji,price){if(!U)return;if((U.stars||0)<price){toast('❌ '+t('notEnoughStars')+' ('+price+' ⭐)');return;}U.stars=(U.stars||0)-price;if(!U.gifts)U.gifts=[];U.gifts.push(emoji);var users=gu();users[U.id].stars=U.stars;users[U.id].gifts=U.gifts.slice();su(users);rp();showGiftShop();toast('✅ '+t('giftBought'));}
 
-// PREMIUM (WORKING)
+// PREMIUM
 function showPrem(){if(!U)return;document.getElementById('premModal').style.display='flex';updatePremBtns();}
 function hidePrem(){document.getElementById('premModal').style.display='none';}
 function updatePremBtns(){document.getElementById('actPremBtn').style.display=U.premium?'none':'block';document.getElementById('cancelPremBtn').style.display=U.premium?'block':'none';}
-window.activatePrem=function(){if(!U)return;var users=gu();users[U.id].premium=true;su(users);U.premium=true;hidePrem();premAnim();rp();toast('⭐ Premium активирован!');};
-window.cancelPrem=function(){if(!U)return;if(confirm('Отменить Premium?')){var users=gu();users[U.id].premium=false;su(users);U.premium=false;hidePrem();rp();toast('Premium отменён');}};
+window.activatePrem=function(){if(!U)return;var users=gu();users[U.id].premium=true;su(users);U.premium=true;hidePrem();premAnim();rp();toast('⭐ '+t('premActivated'));};
+window.cancelPrem=function(){if(!U)return;if(confirm(t('cancelPrem')+'?')){var users=gu();users[U.id].premium=false;su(users);U.premium=false;hidePrem();rp();toast(t('premCancelled'));}};
 
 // AVATAR
-document.getElementById('avatarInput').addEventListener('change',function(e){var f=e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(ev){U.avatar=ev.target.result;var users=gu();users[U.id].avatar=U.avatar;su(users);rp();toast('📷 Фото обновлено!');};r.readAsDataURL(f);});
+document.getElementById('avatarInput').addEventListener('change',function(e){var f=e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(ev){U.avatar=ev.target.result;var users=gu();users[U.id].avatar=U.avatar;su(users);rp();toast('📷 '+t('avatarUpdated'));};r.readAsDataURL(f);});
 
-// SEARCH (FIND FRIENDS)
-document.getElementById('searchInput').addEventListener('input',function(){var q=this.value.trim().toLowerCase();if(q.length>=2&&U){var users=gu();var found=false;for(var id in users){if(id!==U.id&&(users[id].username.toLowerCase().includes(q)||users[id].name.toLowerCase().includes(q))){if(addContact(id)){toast('✅ '+users[id].name+' добавлен!');rc();found=true;break;}}}if(!found){var allContacts=md().contacts||[];var alreadyExists=false;for(var i=0;i<allContacts.length;i++){var c=users[allContacts[i]];if(c&&(c.username.toLowerCase().includes(q)||c.name.toLowerCase().includes(q))){alreadyExists=true;break;}}}}});document.getElementById('searchInput').addEventListener('keypress',function(e){if(e.key==='Enter'){this.value='';rc();}});
+// SEARCH
+document.getElementById('searchInput').addEventListener('input',function(){var q=this.value.trim().toLowerCase();if(q.length>=2&&U){var users=gu();for(var id in users){if(id!==U.id&&(users[id].username.toLowerCase().includes(q)||users[id].name.toLowerCase().includes(q))){if(addContact(id)){toast('✅ '+users[id].name+' '+t('contactAdded'));rc();break;}}}}});
 
-// CREATE (WORKING)
-function showCreate(){document.getElementById('createModal').style.display='flex';}
+// CREATE
+function showCreate(){document.getElementById('createModal').style.display='flex';document.getElementById('cname').value='';}
 function hideCreate(){document.getElementById('createModal').style.display='none';}
-window.doCreate=function(type){var n=document.getElementById('cname').value.trim();if(!n){toast('Введите название');return;}var nid=gid(),d=md();if(type==='channel'){var chs=gc();chs[nid]={id:nid,name:n,desc:'',creatorId:U.id,subscribers:1};sc(chs);if(!d.channels)d.channels=[];d.channels.push(nid);toast('📢 Канал создан!');}else{var grs=gg();grs[nid]={id:nid,name:n,desc:'',creatorId:U.id,members:1};sg(grs);if(!d.groups)d.groups=[];d.groups.push(nid);toast('👥 Группа создана!');}if(!d.messages)d.messages={};d.messages[nid]=[];smd(d);hideCreate();rc();};
+window.doCreate=function(type){var n=document.getElementById('cname').value.trim();if(!n){toast(t('enterName'));return;}var nid=gid(),d=md();if(type==='channel'){var chs=gc();chs[nid]={id:nid,name:n,desc:'',creatorId:U.id,subscribers:1};sc(chs);if(!d.channels)d.channels=[];d.channels.push(nid);toast('📢 '+t('channelCreated'));}else{var grs=gg();grs[nid]={id:nid,name:n,desc:'',creatorId:U.id,members:1};sg(grs);if(!d.groups)d.groups=[];d.groups.push(nid);toast('👥 '+t('groupCreated'));}if(!d.messages)d.messages={};d.messages[nid]=[];smd(d);hideCreate();rc();};
 
-// BC (REAL-TIME CHAT)
-BC.onmessage=function(e){var d=e.data;if(!U)return;if(d.type==='msg'){var data=md();if(!data.messages)data.messages={};var target=null;if(d.chatType==='personal'&&d.to===U.id){target=d.from;if(!data.contacts)data.contacts=[];if(data.contacts.indexOf(d.from)===-1)data.contacts.push(d.from);}if(target&&d.from!==U.id){if(!data.messages[target])data.messages[target]=[];data.messages[target].push({text:d.msg.text,time:d.msg.time,out:false,read:false,sender:d.msg.sender});smd(data);if(active===target)renderMsgs();rc();if(Notification.permission==='granted'){new Notification('FuruGram',{body:'Новое сообщение от @'+d.msg.sender});}}}};
+// BC
+BC.onmessage=function(e){var d=e.data;if(!U)return;if(d.type==='msg'){var data=md();if(!data.messages)data.messages={};var target=null;if(d.chatType==='personal'&&d.to===U.id){target=d.from;if(!data.contacts)data.contacts=[];if(data.contacts.indexOf(d.from)===-1)data.contacts.push(d.from);}if(target&&d.from!==U.id){if(!data.messages[target])data.messages[target]=[];data.messages[target].push({text:d.msg.text,time:d.msg.time,out:false,read:false,sender:d.msg.sender});smd(data);if(active===target)renderMsgs();rc();if(Notification.permission==='granted'){new Notification('FuruGram',{body:'New message from @'+d.msg.sender});}}}};
 
 // INIT
 (function(){
+var savedLang=localStorage.getItem('fg_lang');if(savedLang){LANG=savedLang;}
 var theme=localStorage.getItem('fg_theme');if(theme==='dark'){document.body.classList.add('dark');}
 var s=gs();if(s&&s.id){var users=gu();if(users[s.id]&&users[s.id].password===s.password){U=users[s.id];U.online=true;su(users);document.getElementById('loginScreen').style.display='none';go('chats');return;}}
 document.getElementById('loginScreen').style.display='flex';
+updateAllTexts();
 })();
 go('chats');
-console.log('🚀 FuruGram v24.0 — ВСЁ РАБОТАЕТ! Premium, Подарки, Каналы, Поиск друзей!');
+console.log('🚀 FuruGram v26.0 — Русский/English, Premium, Подарки, Каналы, Группы, Поиск друзей!');
 })();
 </script>
 </body>
