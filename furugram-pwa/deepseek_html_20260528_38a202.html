@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head><title>Создать иконку</title></head>
+<body>
+    <canvas id="c" width="512" height="512"></canvas>
+    <p><a id="d512">Скачать 512x512</a></p>
+    <script>
+        var c = document.getElementById('c');
+        var ctx = c.getContext('2d');
+        var grad = ctx.createLinearGradient(0, 0, 512, 512);
+        grad.addColorStop(0, '#5b8cce');
+        grad.addColorStop(1, '#2b5278');
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.roundRect(0, 0, 512, 512, 100);
+        ctx.fill();
+        ctx.fillStyle = 'white';
+        ctx.font = 'bold 300px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('F', 256, 270);
+        document.getElementById('d512').href = c.toDataURL('image/png');
+        document.getElementById('d512').download = 'icon-512.png';
+    </script>
+</body>
+</html>

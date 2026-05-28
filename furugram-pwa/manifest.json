@@ -1,23 +1,21 @@
 {
     "name": "FuruGram Messenger",
     "short_name": "FuruGram",
-    "description": "Бесплатный мессенджер с чатами, каналами, группами, стикерами и голосовыми сообщениями",
-    "start_url": "/",
+    "description": "Бесплатный мессенджер с чатами, каналами и группами",
+    "start_url": "/furugram/",
     "display": "standalone",
-    "background_color": "#17212b",
-    "theme_color": "#5b8cce",
+    "background_color": "#18222e",
+    "theme_color": "#18222e",
     "orientation": "portrait",
-    "scope": "/",
-    "lang": "ru",
     "icons": [
         {
-            "src": "/icon-192.png",
+            "src": "icon-192.png",
             "sizes": "192x192",
             "type": "image/png",
             "purpose": "any maskable"
         },
         {
-            "src": "/icon-512.png",
+            "src": "icon-512.png",
             "sizes": "512x512",
             "type": "image/png",
             "purpose": "any maskable"
