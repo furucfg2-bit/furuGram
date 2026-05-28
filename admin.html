@@ -2,1219 +2,292 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>FuruGram Messenger</title>
-    
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="FuruGram">
-    <meta name="theme-color" content="#0e1621">
-    <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="icon-192.png">
-    <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FuruGram Admin Panel v24</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    
     <style>
         :root {
-            --bg: #0e1621;
-            --surface: #17212b;
-            --surface2: #1c2c3c;
-            --surface3: #242f3d;
-            --chat-bg: #0e1621;
-            --accent: #5b8cce;
-            --accent-light: #6a9bd4;
-            --accent-gradient: linear-gradient(135deg, #5b8cce, #4a7ab8);
+            --bg: #f0f2f5;
+            --surface: #ffffff;
+            --surface2: #f0f2f5;
+            --accent: #3390ec;
             --premium: #d4a843;
-            --premium-light: #f0c860;
-            --premium-gradient: linear-gradient(135deg, #d4a843, #f0c860, #d4a843);
-            --text: #e9e9e9;
-            --text-secondary: #7f8fa0;
-            --text-muted: #5a6a7a;
-            --border: #1c2c3c;
-            --hover: #1f2d3d;
-            --bubble-out: #182533;
-            --bubble-in: #2b5278;
+            --text: #000000;
+            --text-secondary: #707579;
+            --border: #e0e0e0;
+            --hover: #f0f2f5;
+            --danger: #e53935;
             --online: #4caf50;
-            --danger: #e74c3c;
-            --warning: #f39c12;
-            --safe-bottom: env(safe-area-inset-bottom, 0px);
-            --nav-height: 56px;
         }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
+        .dark {
+            --bg: #18222e;
+            --surface: #1c2838;
+            --surface2: #212e3e;
+            --accent: #5b8cce;
+            --text: #e9e9e9;
+            --text-secondary: #8a9bb0;
+            --border: #253040;
+            --hover: #212e3e;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: #0a0e15;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            height: 100dvh;
-            color: var(--text);
-            overflow: hidden;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-            -webkit-font-smoothing: antialiased;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg); color: var(--text); display: flex; min-height: 100vh;
         }
-
-        .app-container {
-            width: 100%;
-            max-width: 1100px;
-            height: 100vh;
-            height: 100dvh;
-            background: var(--bg);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            position: relative;
-        }
-        @media (min-width: 769px) {
-            .app-container {
-                height: 94vh;
-                height: 94dvh;
-                border-radius: 12px;
-                box-shadow: 0 0 0 1px var(--border);
-            }
-        }
-
-        /* ===== HEADER ===== */
-        .app-header {
-            padding: 12px 16px;
-            background: var(--surface);
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-shrink: 0;
-            z-index: 10;
-        }
-        .header-title {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: var(--accent);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .header-actions {
-            display: flex;
-            gap: 4px;
-        }
-        .icon-btn {
-            width: 34px;
-            height: 34px;
-            border-radius: 50%;
-            background: transparent;
-            border: none;
-            color: var(--text-secondary);
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
-        .icon-btn:hover { background: var(--hover); color: var(--text); }
-        .icon-btn.premium-btn { color: var(--premium); }
-        .icon-btn.premium-btn:hover { color: var(--premium-light); }
-
-        /* ===== MAIN CONTENT ===== */
-        .main-content {
-            flex-grow: 1;
-            display: flex;
-            overflow: hidden;
-            position: relative;
-        }
-
-        /* ===== SIDEBAR (Чаты) ===== */
         .sidebar {
-            width: 100%;
-            background: var(--surface);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            position: absolute;
-            inset: 0;
-            z-index: 5;
-            transition: transform 0.25s ease;
+            width: 250px; background: var(--surface); border-right: 1px solid var(--border);
+            padding: 20px; display: flex; flex-direction: column; gap: 6px; flex-shrink: 0;
         }
-        @media (min-width: 769px) {
-            .sidebar {
-                width: 340px;
-                min-width: 340px;
-                max-width: 340px;
-                position: relative;
-                border-right: 1px solid var(--border);
-            }
+        .sidebar h2 { font-size: 1.3rem; font-weight: 700; color: var(--accent); margin-bottom: 16px; }
+        .nav-btn {
+            padding: 12px 16px; background: transparent; border: none; border-radius: 10px;
+            color: var(--text-secondary); cursor: pointer; text-align: left; font-size: 0.9rem;
+            font-weight: 500; transition: 0.15s; display: flex; align-items: center; gap: 10px;
         }
-        .sidebar.hidden-mobile { transform: translateX(-100%); }
-        @media (min-width: 769px) { .sidebar.hidden-mobile { transform: none; } }
-
-        .search-box {
-            margin: 8px 10px;
-            position: relative;
-            flex-shrink: 0;
+        .nav-btn:hover { background: var(--hover); color: var(--text); }
+        .nav-btn.active { background: var(--accent); color: white; }
+        .main {
+            flex-grow: 1; padding: 30px; overflow-y: auto; max-height: 100vh;
         }
-        .search-box input {
-            width: 100%;
-            padding: 9px 10px 9px 34px;
-            background: var(--surface2);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            color: var(--text);
-            font-size: 0.88rem;
-            outline: none;
+        .main h1 { font-size: 1.6rem; font-weight: 700; color: var(--accent); margin-bottom: 20px; }
+        .stats {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 12px; margin-bottom: 24px;
         }
-        .search-box input:focus { border-color: var(--accent); }
-        .search-box i {
-            position: absolute;
-            left: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-muted);
-            font-size: 0.8rem;
+        .stat-card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 12px; padding: 18px; text-align: center;
         }
-
-        .chat-list {
-            flex-grow: 1;
-            overflow-y: auto;
+        .stat-num { font-size: 2rem; font-weight: 700; color: var(--accent); }
+        .stat-label { font-size: 0.8rem; color: var(--text-secondary); margin-top: 4px; }
+        table {
+            width: 100%; border-collapse: collapse; background: var(--surface);
+            border-radius: 12px; overflow: hidden; border: 1px solid var(--border);
         }
-        .chat-list::-webkit-scrollbar { width: 3px; }
-        .chat-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
-
-        .chat-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px 12px;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .chat-item:hover { background: var(--hover); }
-        .chat-item.active { background: var(--hover); border-left: 3px solid var(--accent); }
-        .chat-avatar {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            background: var(--accent);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 1rem;
-            color: white;
-            flex-shrink: 0;
-            position: relative;
-            overflow: hidden;
-            background-size: cover;
-            background-position: center;
-        }
-        .chat-avatar img { width: 100%; height: 100%; object-fit: cover; }
-        .chat-avatar.channel { background: #4a90d9; }
-        .chat-avatar.group { background: #4caf50; }
-        .chat-avatar.premium { border: 2px solid var(--premium); box-shadow: 0 0 12px rgba(212,168,67,0.4); }
-        .online-dot {
-            position: absolute;
-            bottom: 1px;
-            right: 1px;
-            width: 10px;
-            height: 10px;
-            background: var(--online);
-            border-radius: 50%;
-            border: 2px solid var(--surface);
-        }
-        .chat-body { flex-grow: 1; min-width: 0; }
-        .chat-name {
-            font-weight: 600;
+        th, td {
+            padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border);
             font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            gap: 5px;
         }
+        th { background: var(--surface2); color: var(--text-secondary); font-weight: 600; font-size: 0.75rem; text-transform: uppercase; }
+        tr:hover td { background: var(--hover); }
         .badge {
-            font-size: 0.6rem;
-            padding: 1px 6px;
-            border-radius: 3px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
+            display: inline-block; padding: 3px 10px; border-radius: 12px;
+            font-size: 0.7rem; font-weight: 600;
         }
-        .badge-channel { background: rgba(74,144,217,0.2); color: #74b9ff; }
-        .badge-group { background: rgba(76,175,80,0.2); color: #81c784; }
-        .chat-preview {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            margin-top: 2px;
+        .badge-online { background: rgba(76,175,80,0.15); color: var(--online); }
+        .badge-offline { background: rgba(112,117,121,0.15); color: var(--text-secondary); }
+        .badge-premium { background: rgba(212,168,67,0.15); color: var(--premium); }
+        .badge-admin { background: rgba(243,156,18,0.15); color: #f39c12; }
+        .btn-sm {
+            padding: 6px 12px; border-radius: 8px; border: 1px solid var(--border);
+            background: transparent; color: var(--text-secondary); cursor: pointer;
+            font-size: 0.78rem; font-weight: 500; transition: 0.15s; margin: 2px;
         }
-        .chat-meta { text-align: right; flex-shrink: 0; }
-        .chat-time { font-size: 0.7rem; color: var(--text-muted); }
-        .unread {
-            background: var(--accent);
-            color: white;
-            font-size: 0.68rem;
-            font-weight: 700;
-            padding: 2px 7px;
-            border-radius: 10px;
-            display: inline-block;
-            margin-top: 3px;
-            min-width: 20px;
-            text-align: center;
+        .btn-sm:hover { border-color: var(--accent); color: var(--accent); }
+        .btn-sm.danger { color: var(--danger); }
+        .btn-sm.danger:hover { border-color: var(--danger); background: rgba(229,57,53,0.1); }
+        .btn-sm.success { color: var(--online); }
+        .btn-sm.success:hover { border-color: var(--online); background: rgba(76,175,80,0.1); }
+        .btn-sm.warning { color: var(--premium); }
+        .btn-sm.warning:hover { border-color: var(--premium); background: rgba(212,168,67,0.1); }
+        .btn-refresh {
+            padding: 10px 18px; background: var(--accent); border: none; border-radius: 10px;
+            color: white; cursor: pointer; font-weight: 600; font-size: 0.9rem; margin-bottom: 16px;
         }
-
-        /* ===== CHAT AREA ===== */
-        .chat-area {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            background: var(--chat-bg);
-            overflow: hidden;
-        }
-        .chat-head {
-            padding: 10px 14px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: var(--surface);
-            flex-shrink: 0;
-        }
-        .back-btn {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: transparent;
-            border: none;
-            color: var(--text-secondary);
-            cursor: pointer;
-            font-size: 0.85rem;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            transition: 0.2s;
-        }
-        .back-btn:hover { background: var(--hover); color: var(--text); }
-        @media (max-width: 768px) { .back-btn { display: flex; } }
-        .chat-head-info { flex-grow: 1; min-width: 0; }
-        .chat-head-name { font-weight: 600; font-size: 0.95rem; }
-        .chat-head-status { font-size: 0.73rem; color: var(--text-secondary); }
-        .dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; margin-right: 4px; }
-        .dot.online { background: var(--online); }
-        .dot.offline { background: var(--text-muted); }
-
-        .messages {
-            flex-grow: 1;
-            padding: 12px 16px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-        .messages::-webkit-scrollbar { width: 3px; }
-        .messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
-
-        .msg {
-            display: flex;
-            max-width: 72%;
-            animation: msgIn 0.2s ease;
-        }
-        @keyframes msgIn { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:translateY(0); } }
-        .msg.out { align-self: flex-end; }
-        .msg-bubble {
-            padding: 7px 10px;
-            border-radius: 6px;
-            font-size: 0.9rem;
-            line-height: 1.4;
-            word-break: break-word;
-        }
-        .msg.in .msg-bubble { background: var(--bubble-out); border: 1px solid var(--border); }
-        .msg.out .msg-bubble { background: var(--bubble-in); color: white; }
-        .msg-sender { font-size: 0.72rem; font-weight: 700; color: var(--accent); margin-bottom: 2px; }
-        .msg-time { font-size: 0.62rem; opacity: 0.5; text-align: right; margin-top: 2px; }
-        .msg.out .msg-time { opacity: 0.7; }
-        .date-split {
-            text-align: center;
-            margin: 8px 0;
-            font-size: 0.72rem;
-            color: var(--text-muted);
-        }
-        .date-split span {
-            background: var(--chat-bg);
-            padding: 2px 10px;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-        }
-
-        .input-row {
-            padding: 8px 12px;
-            padding-bottom: calc(8px + var(--safe-bottom));
-            border-top: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: var(--surface);
-            flex-shrink: 0;
-        }
-        .input-row input {
-            flex-grow: 1;
-            padding: 9px 12px;
-            background: var(--surface2);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            color: var(--text);
-            font-size: 0.9rem;
-            outline: none;
-        }
-        .input-row input:focus { border-color: var(--accent); }
-        .send-btn {
-            width: 38px;
-            height: 38px;
-            border-radius: 50%;
-            background: var(--accent);
-            border: none;
-            color: white;
-            font-size: 0.9rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-        .send-btn:hover { background: var(--accent-light); }
-        .send-btn:active { transform: scale(0.94); }
-
-        .empty-state {
-            flex-grow: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            color: var(--text-secondary);
-            gap: 10px;
-        }
-        .empty-state i { font-size: 3.5rem; opacity: 0.1; }
-        .empty-state h3 { font-weight: 600; color: var(--text); }
-
-        /* ===== PAGES ===== */
-        .page {
-            position: absolute;
-            inset: 0;
-            background: var(--surface);
-            z-index: 6;
-            overflow-y: auto;
-            display: none;
-        }
-        .page.show { display: block; }
-
-        /* ===== CONTACTS ===== */
-        .contact-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 12px 16px;
-            cursor: pointer;
-            transition: 0.2s;
-            border-bottom: 1px solid var(--border);
-        }
-        .contact-item:hover { background: var(--hover); }
-
-        /* ===== PROFILE ===== */
-        .profile-header-card {
-            text-align: center;
-            padding: 24px 16px;
-            background: var(--surface2);
-            border-bottom: 1px solid var(--border);
-        }
-        .profile-avatar-large {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            background: var(--accent);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-            font-weight: 700;
-            color: white;
-            margin: 0 auto 12px;
-            position: relative;
-            overflow: hidden;
-            cursor: pointer;
-            transition: 0.2s;
-            background-size: cover;
-            background-position: center;
-        }
-        .profile-avatar-large:hover { opacity: 0.85; }
-        .profile-avatar-large img { width: 100%; height: 100%; object-fit: cover; }
-        .profile-avatar-large.premium {
-            border: 3px solid var(--premium);
-            box-shadow: 0 0 20px rgba(212,168,67,0.5);
-            animation: premiumPulse 2s ease-in-out infinite;
-        }
-        @keyframes premiumPulse {
-            0%, 100% { box-shadow: 0 0 20px rgba(212,168,67,0.5); }
-            50% { box-shadow: 0 0 35px rgba(240,200,96,0.8); }
-        }
-        .profile-name {
-            font-size: 1.2rem;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
-        .premium-star-lg { color: var(--premium); font-size: 1rem; }
-        .profile-username { color: var(--text-secondary); font-size: 0.9rem; margin-top: 2px; }
-        .profile-bio { color: var(--text-secondary); font-size: 0.85rem; margin-top: 6px; }
-        .profile-stats {
-            display: flex;
-            justify-content: center;
-            gap: 24px;
-            margin-top: 12px;
-        }
-        .profile-stat { text-align: center; }
-        .profile-stat-num { font-weight: 700; font-size: 1.1rem; }
-        .profile-stat-label { font-size: 0.7rem; color: var(--text-muted); }
-
-        .profile-section {
-            padding: 4px 0;
-            border-bottom: 1px solid var(--border);
-        }
-        .profile-section:last-child { border-bottom: none; }
-        .profile-section-title {
-            padding: 12px 16px 4px;
-            font-size: 0.72rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            font-weight: 600;
-        }
-        .profile-item {
-            display: flex;
-            align-items: center;
-            padding: 12px 16px;
-            cursor: pointer;
-            transition: 0.2s;
-            color: var(--text);
-            font-size: 0.9rem;
-            gap: 12px;
-        }
-        .profile-item:hover { background: var(--hover); }
-        .profile-item i {
-            width: 22px;
-            text-align: center;
-            font-size: 0.95rem;
-            color: var(--text-secondary);
-        }
-        .profile-item .item-content { flex-grow: 1; }
-        .profile-item .item-value { color: var(--text-secondary); font-size: 0.85rem; margin-right: 4px; }
-        .profile-item .arrow { color: var(--text-muted); font-size: 0.7rem; }
-        .profile-item.danger { color: var(--danger); }
-        .profile-item.danger i { color: var(--danger); }
-
-        /* ===== SETTINGS ===== */
-        .settings-item {
-            display: flex;
-            align-items: center;
-            padding: 12px 16px;
-            cursor: pointer;
-            transition: 0.2s;
-            gap: 12px;
-            border-bottom: 1px solid var(--border);
-        }
-        .settings-item:hover { background: var(--hover); }
-        .settings-item i { width: 22px; text-align: center; color: var(--text-secondary); }
-        .settings-item .item-content { flex-grow: 1; }
-        .settings-item .item-value { color: var(--text-muted); font-size: 0.85rem; }
-
-        /* ===== BOTTOM NAV ===== */
-        .bottom-nav {
-            display: flex;
-            background: var(--surface);
-            border-top: 1px solid var(--border);
-            flex-shrink: 0;
-            padding-bottom: var(--safe-bottom);
-            z-index: 20;
-        }
-        .nav-item {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 8px 0;
-            cursor: pointer;
-            color: var(--text-secondary);
-            transition: 0.2s;
-            border: none;
-            background: transparent;
-            font-size: 0.65rem;
-            font-weight: 500;
-            gap: 3px;
-        }
-        .nav-item i { font-size: 1.15rem; }
-        .nav-item.active { color: var(--accent); }
-        .nav-item:hover { color: var(--text); }
-
-        /* ===== MODALS ===== */
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.75);
-            z-index: 100;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            visibility: hidden;
-            transition: 0.2s;
-            padding: 16px;
-        }
-        .modal-overlay.show { opacity: 1; visibility: visible; }
-        .modal {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 20px 16px;
-            width: 340px;
-            max-width: 100%;
-            max-height: 80vh;
-            overflow-y: auto;
-            position: relative;
-        }
-        .modal h2 { font-size: 1.1rem; font-weight: 700; text-align: center; margin-bottom: 14px; }
-        .modal-close {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            background: var(--hover);
-            border: none;
-            color: var(--text-secondary);
-            cursor: pointer;
-        }
-        .modal-close:hover { color: white; }
-        .field { margin-bottom: 10px; }
-        .field label { display: block; font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 4px; }
-        .field input {
-            width: 100%;
-            padding: 9px 10px;
-            background: var(--surface2);
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            color: var(--text);
-            font-size: 0.9rem;
-            outline: none;
+        .btn-refresh:hover { opacity: 0.9; }
+        .field { margin-bottom: 12px; }
+        .field label { display: block; font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 5px; font-weight: 500; }
+        .field input, .field select {
+            width: 100%; padding: 10px 12px; background: var(--surface2);
+            border: 1px solid var(--border); border-radius: 8px; color: var(--text);
+            font-size: 0.9rem; outline: none;
         }
         .field input:focus { border-color: var(--accent); }
-        .btn {
-            width: 100%;
-            padding: 10px;
-            border: none;
-            border-radius: 4px;
-            color: white;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 4px;
-            font-size: 0.9rem;
-        }
-        .btn-primary { background: var(--accent); }
-        .btn-premium { background: var(--premium-gradient); color: #1a1a2e; font-weight: 700; animation: premiumShine 2s ease-in-out infinite; background-size: 200% 200%; }
-        @keyframes premiumShine {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-        }
-        .btn-danger { background: var(--danger); }
-        .error { color: var(--danger); font-size: 0.75rem; margin-top: 4px; display: none; }
-        .error.show { display: block; }
-
-        /* ===== PREMIUM ANIMATION ===== */
-        .premium-overlay {
-            position: fixed;
-            inset: 0;
-            z-index: 200;
-            pointer-events: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .premium-animation {
-            text-align: center;
-            animation: premiumBoom 2s ease-out forwards;
-        }
-        .premium-animation .stars {
-            font-size: 5rem;
-            animation: starSpin 0.5s ease-in-out 3;
-        }
-        .premium-animation .text {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--premium-light);
-            margin-top: 10px;
-            animation: fadeInUp 0.5s ease;
-        }
-        @keyframes premiumBoom {
-            0% { transform: scale(0); opacity: 1; }
-            50% { transform: scale(1.5); opacity: 1; }
-            100% { transform: scale(2); opacity: 0; }
-        }
-        @keyframes starSpin {
-            0%, 100% { transform: rotate(0deg) scale(1); }
-            50% { transform: rotate(180deg) scale(1.5); }
-        }
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
         .toast {
-            position: fixed;
-            bottom: 80px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--surface3);
-            color: white;
-            padding: 9px 16px;
-            border-radius: 6px;
-            font-weight: 500;
-            font-size: 0.82rem;
-            z-index: 150;
-            border: 1px solid var(--border);
-            animation: toastIn 0.3s ease, toastOut 0.3s ease 2.5s forwards;
-            pointer-events: none;
+            position: fixed; bottom: 24px; right: 24px; background: var(--accent);
+            color: white; padding: 12px 20px; border-radius: 10px; font-weight: 600;
+            font-size: 0.85rem; z-index: 100; animation: fadeIn 0.3s;
         }
-        @keyframes toastIn { from { opacity:0; transform:translateX(-50%) translateY(10px); } to { opacity:1; transform:translateX(-50%) translateY(0); } }
-        @keyframes toastOut { from { opacity:1; } to { opacity:0; transform:translateX(-50%) translateY(-8px); } }
-
-        @media (max-width: 768px) {
-            .app-header { padding: 10px 14px; }
-            .header-title { font-size: 1.1rem; }
-            .msg { max-width: 85%; }
+        @keyframes fadeIn { from{opacity:0;transform:translateY(10px);} to{opacity:1;transform:translateY(0);} }
+        @media (max-width:768px) {
+            body { flex-direction:column; }
+            .sidebar { width:100%; flex-direction:row; flex-wrap:wrap; padding:12px; gap:4px; }
+            .sidebar h2 { width:100%; }
+            .nav-btn { flex:1; text-align:center; font-size:0.78rem; padding:10px; }
+            .main { padding:16px; }
+            table { font-size:0.75rem; }
+            th, td { padding:8px 10px; }
         }
     </style>
 </head>
-<body>
+<body class="light">
 
-<div class="app-container" id="app">
-    <!-- HEADER -->
-    <div class="app-header">
-        <div class="header-title" id="headerTitle">💬 FuruGram</div>
-        <div class="header-actions">
-            <button class="icon-btn" id="createBtn" title="Создать"><i class="fas fa-plus"></i></button>
-            <button class="icon-btn premium-btn" id="premiumBtn" title="Premium"><i class="fas fa-star"></i></button>
-        </div>
-    </div>
-
-    <!-- MAIN CONTENT -->
-    <div class="main-content">
-        <!-- SIDEBAR (Чаты) -->
-        <div class="sidebar" id="sidebar">
-            <div class="search-box">
-                <i class="fas fa-search"></i>
-                <input type="text" placeholder="Поиск чатов..." id="searchInput">
-            </div>
-            <div class="chat-list" id="chatList"></div>
-        </div>
-
-        <!-- CHAT AREA -->
-        <div class="chat-area" id="chatArea">
-            <div class="empty-state" id="emptyState">
-                <i class="fas fa-comments"></i>
-                <h3>FuruGram</h3>
-                <p>Выберите чат</p>
-            </div>
-            <div class="chat-head" id="chatHead" style="display:none;">
-                <button class="back-btn" id="backBtn"><i class="fas fa-arrow-left"></i></button>
-                <div class="chat-avatar" id="chatAvatar" style="width:36px;height:36px;font-size:0.8rem;">A</div>
-                <div class="chat-head-info">
-                    <div class="chat-head-name" id="chatHeadName"></div>
-                    <div class="chat-head-status" id="chatHeadStatus"></div>
-                </div>
-            </div>
-            <div class="messages" id="messages" style="display:none;"></div>
-            <div class="input-row" id="inputRow" style="display:none;">
-                <input type="text" placeholder="Сообщение..." id="msgInput">
-                <button class="send-btn" id="sendBtn"><i class="fas fa-paper-plane"></i></button>
-            </div>
-        </div>
-
-        <!-- CONTACTS PAGE -->
-        <div class="page" id="contactsPage"></div>
-
-        <!-- PROFILE PAGE -->
-        <div class="page" id="profilePage"></div>
-
-        <!-- SETTINGS PAGE -->
-        <div class="page" id="settingsPage"></div>
-    </div>
-
-    <!-- BOTTOM NAV -->
-    <div class="bottom-nav">
-        <button class="nav-item active" data-page="chats">
-            <i class="fas fa-comment-dots"></i>
-            <span>Чаты</span>
-        </button>
-        <button class="nav-item" data-page="contacts">
-            <i class="fas fa-address-book"></i>
-            <span>Контакты</span>
-        </button>
-        <button class="nav-item" data-page="settings">
-            <i class="fas fa-cog"></i>
-            <span>Настройки</span>
-        </button>
-        <button class="nav-item" data-page="profile">
-            <i class="fas fa-user-circle"></i>
-            <span>Профиль</span>
-        </button>
-    </div>
+<div class="sidebar">
+    <h2>👑 Admin v24</h2>
+    <button class="nav-btn active" data-page="dashboard"><i class="fas fa-chart-bar"></i> Дашборд</button>
+    <button class="nav-btn" data-page="users"><i class="fas fa-users"></i> Пользователи</button>
+    <button class="nav-btn" data-page="stars"><i class="fas fa-star"></i> Выдать звёзды</button>
+    <button class="nav-btn" data-page="premium"><i class="fas fa-crown"></i> Premium</button>
+    <button class="nav-btn" data-page="channels"><i class="fas fa-bullhorn"></i> Каналы</button>
+    <button class="nav-btn" data-page="groups"><i class="fas fa-user-friends"></i> Группы</button>
+    <button class="nav-btn" data-page="messages"><i class="fas fa-comments"></i> Сообщения</button>
+    <button class="nav-btn" data-page="settings"><i class="fas fa-cog"></i> Настройки</button>
 </div>
 
-<!-- CREATE MODAL -->
-<div class="modal-overlay" id="createModal">
-    <div class="modal">
-        <button class="modal-close" id="createClose"><i class="fas fa-times"></i></button>
-        <h2>Создать</h2>
-        <div style="display:flex;gap:4px;margin-bottom:12px;">
-            <button class="btn btn-primary" style="flex:1;" id="createChannelTab">📢 Канал</button>
-            <button class="btn" style="flex:1;background:var(--surface2);" id="createGroupTab">👥 Группа</button>
-        </div>
-        <div class="field"><label>Название</label><input type="text" id="createName"></div>
-        <div class="field"><label>Описание</label><input type="text" id="createDesc"></div>
-        <div class="error" id="createError"></div>
-        <button class="btn btn-primary" id="createSubmitBtn">Создать</button>
-    </div>
-</div>
-
-<!-- PREMIUM MODAL -->
-<div class="modal-overlay" id="premiumModal">
-    <div class="modal">
-        <button class="modal-close" id="premiumClose"><i class="fas fa-times"></i></button>
-        <h2>⭐ FuruGram Premium</h2>
-        <div style="text-align:center;padding:10px;">
-            <div style="font-size:3rem;">⭐</div>
-            <p style="color:var(--text-secondary);margin-bottom:8px;">Эксклюзивные возможности</p>
-            <div style="text-align:left;color:var(--text-secondary);font-size:0.85rem;line-height:1.8;">
-                ✅ Золотая рамка аватара<br>
-                ✅ Анимация профиля<br>
-                ✅ Эксклюзивные стикеры<br>
-                ✅ Приоритетная поддержка<br>
-                ✅ Увеличенные файлы
-            </div>
-        </div>
-        <button class="btn btn-premium" id="activatePremiumBtn">Активировать бесплатно</button>
-        <button class="btn btn-danger" id="cancelPremiumBtn" style="display:none;">Отменить Premium</button>
-        <p style="text-align:center;font-size:0.7rem;color:var(--text-muted);margin-top:6px;">Пока бесплатно для всех</p>
-    </div>
-</div>
-
-<!-- HIDDEN FILE INPUT -->
-<input type="file" id="avatarInput" accept="image/*" style="display:none;">
+<div class="main" id="mainContent"></div>
 
 <script>
-(function() {
-    var USERS = 'fg_users_v11';
-    var DB = 'fg_db_v11';
-    var CHANNELS = 'fg_channels_v11';
-    var GROUPS = 'fg_groups_v11';
-    var SESSION = 'fg_session_v11';
-    var BC = new BroadcastChannel('fg_v11');
+(function(){
+var US='fg24u',DB='fg24d',CH='fg24ch',GR='fg24gr';
+function gu(){try{return JSON.parse(localStorage.getItem(US)||'{}');}catch(e){return{};}}
+function su(v){try{localStorage.setItem(US,JSON.stringify(v));return true;}catch(e){return false;}}
+function gd(){try{return JSON.parse(localStorage.getItem(DB)||'{}');}catch(e){return{};}}
+function sd(v){try{localStorage.setItem(DB,JSON.stringify(v));return true;}catch(e){return false;}}
+function gc(){try{return JSON.parse(localStorage.getItem(CH)||'{}');}catch(e){return{};}}
+function sc(v){try{localStorage.setItem(CH,JSON.stringify(v));}catch(e){return false;}}
+function gg(){try{return JSON.parse(localStorage.getItem(GR)||'{}');}catch(e){return{};}}
+function sg(v){try{localStorage.setItem(GR,JSON.stringify(v));}catch(e){return false;}}
 
-    function getU() { return JSON.parse(localStorage.getItem(USERS)||'{}'); }
-    function setU(v) { localStorage.setItem(USERS,JSON.stringify(v)); }
-    function getD() { return JSON.parse(localStorage.getItem(DB)||'{"users":{}}'); }
-    function setD(v) { localStorage.setItem(DB,JSON.stringify(v)); }
-    function getCh() { return JSON.parse(localStorage.getItem(CHANNELS)||'{}'); }
-    function setCh(v) { localStorage.setItem(CHANNELS,JSON.stringify(v)); }
-    function getGr() { return JSON.parse(localStorage.getItem(GROUPS)||'{}'); }
-    function setGr(v) { localStorage.setItem(GROUPS,JSON.stringify(v)); }
-    function getS() { return JSON.parse(localStorage.getItem(SESSION)||'null'); }
-    function setS(v) { localStorage.setItem(SESSION,JSON.stringify(v)); }
+function toast(m){var t=document.createElement('div');t.className='toast';t.textContent=m;document.body.appendChild(t);setTimeout(function(){t.remove();},2500);}
 
-    if (Object.keys(getU()).length===0) {
-        setU({
-            'anna@furu.com':{id:'anna@furu.com',type:'email',name:'Анна',username:'anna',password:'123456',avatar:'',online:false,premium:false,role:'user',bio:'Люблю общаться!',birthday:'',phone:''},
-            'max@furu.com':{id:'max@furu.com',type:'email',name:'Максим',username:'max_codes',password:'123456',avatar:'',online:false,premium:false,role:'user',bio:'Разработчик',birthday:'',phone:''},
-            'admin@furu.com':{id:'admin@furu.com',type:'email',name:'Администратор',username:'admin',password:'admin123',avatar:'',online:false,premium:true,role:'admin',bio:'Главный админ FuruGram',birthday:'01.01.2020',phone:'+79000000000'}
-        });
+function renderDashboard(){
+    var users=gu(),db=gd(),chs=gc(),grs=gg();
+    var total=Object.keys(users).length;
+    var online=Object.values(users).filter(function(u){return u.online;}).length;
+    var premium=Object.values(users).filter(function(u){return u.premium;}).length;
+    var msgs=0;for(var e in db){for(var c in db[e].messages||{}){msgs+=db[e].messages[c].length;}}
+    return '<h1>📊 Дашборд</h1><button class="btn-refresh" onclick="refresh()">🔄 Обновить</button>'+
+    '<div class="stats">'+
+    '<div class="stat-card"><div class="stat-num">'+total+'</div><div class="stat-label">Пользователей</div></div>'+
+    '<div class="stat-card"><div class="stat-num">'+online+'</div><div class="stat-label">Онлайн</div></div>'+
+    '<div class="stat-card"><div class="stat-num">'+premium+'</div><div class="stat-label">Premium</div></div>'+
+    '<div class="stat-card"><div class="stat-num">'+msgs+'</div><div class="stat-label">Сообщений</div></div>'+
+    '<div class="stat-card"><div class="stat-num">'+Object.keys(chs).length+'</div><div class="stat-label">Каналов</div></div>'+
+    '<div class="stat-card"><div class="stat-num">'+Object.keys(grs).length+'</div><div class="stat-label">Групп</div></div>'+
+    '</div>';
+}
+
+function renderUsers(){
+    var users=gu();
+    var html='<h1>👥 Пользователи</h1><button class="btn-refresh" onclick="refresh()">🔄 Обновить</button><table><thead><tr><th>Email</th><th>Имя</th><th>Юзернейм</th><th>Звёзды</th><th>Premium</th><th>Статус</th><th>Подарки</th><th>Действия</th></tr></thead><tbody>';
+    for(var id in users){
+        var u=users[id];
+        html+='<tr>'+
+        '<td>'+id.substring(0,25)+'</td>'+
+        '<td>'+u.name+'</td>'+
+        '<td>@'+u.username+'</td>'+
+        '<td>'+(u.stars||0)+' ⭐</td>'+
+        '<td>'+(u.premium?'<span class="badge badge-premium">⭐ Premium</span>':'<span class="badge badge-offline">—</span>')+'</td>'+
+        '<td>'+(u.online?'<span class="badge badge-online">Онлайн</span>':'<span class="badge badge-offline">Оффлайн</span>')+'</td>'+
+        '<td>'+(u.gifts||[]).join(' ')+'</td>'+
+        '<td>'+
+        '<button class="btn-sm success" onclick="giveStars(\''+id+'\')">⭐ Звёзды</button>'+
+        '<button class="btn-sm warning" onclick="togglePremium(\''+id+'\')">'+(u.premium?'⬇ Снять':'👑 Premium')+'</button>'+
+        '<button class="btn-sm danger" onclick="deleteUser(\''+id+'\')">🗑️</button>'+
+        '</td></tr>';
     }
+    return html+'</tbody></table>';
+}
 
-    var user = null;
-    var active = null;
-    var currentPage = 'chats';
-    var createType = 'channel';
+function renderStars(){
+    var users=gu();
+    var html='<h1>⭐ Выдать звёзды</h1><div class="stat-card" style="margin-bottom:16px;text-align:left;max-width:400px;">'+
+    '<div class="field"><label>Пользователь</label><select id="starUser">';
+    for(var id in users){html+='<option value="'+id+'">'+users[id].name+' (@'+users[id].username+') — '+users[id].stars+' ⭐</option>';}
+    html+='</select></div>'+
+    '<div class="field"><label>Количество звёзд</label><input type="number" id="starAmount" value="50" min="1" max="10000"></div>'+
+    '<button class="btn-refresh" onclick="doGiveStars()" style="width:100%;">⭐ Выдать звёзды</button>'+
+    '<p style="color:var(--text-secondary);margin-top:8px;font-size:0.85rem;">Звёзды можно использовать для покупки подарков в магазине.</p>'+
+    '</div>';
+    return html;
+}
 
-    function toast(m) {
-        var t=document.createElement('div');t.className='toast';t.textContent=m;
-        document.body.appendChild(t);setTimeout(function(){t.remove();},3000);
-    }
+function renderPremium(){
+    var users=gu();
+    var html='<h1>👑 Управление Premium</h1><div class="stat-card" style="margin-bottom:16px;text-align:left;max-width:400px;">'+
+    '<div class="field"><label>Пользователь</label><select id="premUser">';
+    for(var id in users){html+='<option value="'+id+'">'+users[id].name+' (@'+users[id].username+') — '+(users[id].premium?'Premium':'Обычный')+'</option>';}
+    html+='</select></div>'+
+    '<button class="btn-refresh" onclick="doTogglePremium()" style="width:100%;background:linear-gradient(135deg,#d4a843,#f0c860);color:#1a1a2e;">👑 Включить/Отключить Premium</button>'+
+    '<p style="color:var(--text-secondary);margin-top:8px;font-size:0.85rem;">Premium даёт золотую рамку аватара и эксклюзивные функции.</p>'+
+    '</div>';
+    return html;
+}
 
-    function showPremiumAnimation() {
-        var overlay = document.createElement('div');
-        overlay.className = 'premium-overlay';
-        overlay.innerHTML = '<div class="premium-animation"><div class="stars">⭐</div><div class="text">Premium активирован!</div></div>';
-        document.body.appendChild(overlay);
-        setTimeout(function() { overlay.remove(); }, 2000);
-    }
+function renderChannels(){
+    var chs=gc();
+    var html='<h1>📢 Каналы</h1><table><thead><tr><th>ID</th><th>Название</th><th>Создатель</th><th>Подписчики</th></tr></thead><tbody>';
+    for(var id in chs){html+='<tr><td>'+id+'</td><td>'+chs[id].name+'</td><td>'+chs[id].creatorId+'</td><td>'+chs[id].subscribers+'</td></tr>';}
+    return html+'</tbody></table>';
+}
 
-    function genId(){return 'id'+Date.now()+Math.random().toString(36).substr(2,6);}
+function renderGroups(){
+    var grs=gg();
+    var html='<h1>👥 Группы</h1><table><thead><tr><th>ID</th><th>Название</th><th>Создатель</th><th>Участники</th></tr></thead><tbody>';
+    for(var id in grs){html+='<tr><td>'+id+'</td><td>'+grs[id].name+'</td><td>'+grs[id].creatorId+'</td><td>'+grs[id].members+'</td></tr>';}
+    return html+'</tbody></table>';
+}
 
-    function myData(){
-        if(!user)return{contacts:[],messages:{},channels:[],groups:[]};
-        var d=getD();return d.users[user.id]||{contacts:[],messages:{},channels:[],groups:[]};
-    }
-    function saveMyData(v){var d=getD();d.users[user.id]=v;setD(d);}
+function renderMessages(){
+    var db=gd(),users=gu();
+    var all=[];for(var ue in db){for(var cid in db[ue].messages||{}){db[ue].messages[cid].forEach(function(m){all.push({user:ue,chat:cid,text:m.text||'',time:m.time||'',sender:m.sender||''});});}}
+    all.sort(function(a,b){return b.time.localeCompare(a.time);});
+    var html='<h1>💬 Последние сообщения</h1><table><thead><tr><th>От</th><th>Чат</th><th>Текст</th><th>Время</th><th>Действия</th></tr></thead><tbody>';
+    all.slice(0,100).forEach(function(m){html+='<tr><td>'+m.sender+'</td><td>'+m.chat.substring(0,15)+'</td><td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+m.text+'</td><td>'+m.time+'</td><td><button class="btn-sm danger" onclick="deleteMsg(\''+m.user+'\',\''+m.chat+'\',\''+m.time+'\')">🗑️</button></td></tr>';});
+    return html+'</tbody></table><p style="color:var(--text-secondary);margin-top:8px;">Показаны последние 100 сообщений</p>';
+}
 
-    function allChats(){
-        var d=myData(),users=getU(),chs=getCh(),grs=getGr(),list=[];
-        (d.contacts||[]).forEach(function(cid){
-            if(users[cid]){var u=users[cid];list.push({id:cid,type:'personal',name:u.name,username:'@'+u.username,avatar:u.avatar,online:u.online,premium:u.premium,initials:u.name.charAt(0).toUpperCase(),unread:(d.messages[cid]||[]).filter(function(m){return !m.read&&!m.out;}).length,messages:d.messages[cid]||[]});}
-        });
-        (d.channels||[]).forEach(function(chId){if(chs[chId]){var c=chs[chId];list.push({id:chId,type:'channel',name:c.name,initials:c.name.charAt(0).toUpperCase(),subscribers:c.subscribers||1,unread:(d.messages[chId]||[]).filter(function(m){return !m.read;}).length,messages:d.messages[chId]||[]});}});
-        (d.groups||[]).forEach(function(grId){if(grs[grId]){var g=grs[grId];list.push({id:grId,type:'group',name:g.name,initials:g.name.charAt(0).toUpperCase(),members:g.members||1,unread:(d.messages[grId]||[]).filter(function(m){return !m.read;}).length,messages:d.messages[grId]||[]});}});
-        return list;
-    }
+function renderSettings(){
+    return '<h1>🔧 Настройки</h1>'+
+    '<div class="stat-card" style="max-width:400px;">'+
+    '<button class="btn-refresh" style="background:var(--danger);width:100%;" onclick="clearAll()">⚠️ Сбросить все данные</button>'+
+    '<p style="color:var(--text-secondary);margin-top:8px;font-size:0.85rem;">Это удалит ВСЕХ пользователей, сообщения, каналы и группы. Отменить нельзя!</p>'+
+    '<p style="color:var(--text-secondary);margin-top:16px;">Версия админ-панели: <b>24.0</b></p>'+
+    '<p style="color:var(--text-secondary);">Совместима с FuruGram v24.0</p>'+
+    '</div>';
+}
 
-    function addContact(cid){
-        var d=myData();if(!d.contacts)d.contacts=[];
-        if(d.contacts.indexOf(cid)===-1){d.contacts.push(cid);if(!d.messages)d.messages={};if(!d.messages[cid])d.messages[cid]=[];saveMyData(d);return true;}
-        return false;
-    }
+// ACTIONS
+window.giveStars=function(id){var amt=prompt('Сколько звёзд выдать пользователю '+id+'?','50');if(!amt||isNaN(amt))return;amt=parseInt(amt);var u=gu();if(u[id]){u[id].stars=(u[id].stars||0)+amt;su(u);toast('⭐ Выдано '+amt+' звёзд!');refresh();}};
+window.doGiveStars=function(){var id=document.getElementById('starUser').value;var amt=parseInt(document.getElementById('starAmount').value);if(!amt||amt<1)return;var u=gu();if(u[id]){u[id].stars=(u[id].stars||0)+amt;su(u);toast('⭐ Выдано '+amt+' звёзд пользователю '+u[id].name+'!');refresh();}};
+window.togglePremium=function(id){var u=gu();if(u[id]){u[id].premium=!u[id].premium;su(u);toast(u[id].premium?'👑 Premium включен!':'⬇ Premium отключен');refresh();}};
+window.doTogglePremium=function(){var id=document.getElementById('premUser').value;var u=gu();if(u[id]){u[id].premium=!u[id].premium;su(u);toast(u[id].premium?'👑 Premium включен для '+u[id].name:'⬇ Premium отключен для '+u[id].name);refresh();}};
+window.deleteUser=function(id){if(confirm('Удалить пользователя '+id+'?')){var u=gu();delete u[id];su(u);var d=gd();delete d[id];sd(d);toast('🗑️ Пользователь удалён');refresh();}};
+window.deleteMsg=function(user,chat,time){var d=gd();if(d[user]&&d[user].messages[chat]){d[user].messages[chat]=d[user].messages[chat].filter(function(m){return m.time!==time;});sd(d);toast('Сообщение удалено');refresh();}};
+window.clearAll=function(){if(confirm('Удалить ВСЕ данные? Это нельзя отменить!')){if(confirm('Точно удалить?')){localStorage.removeItem(US);localStorage.removeItem(DB);localStorage.removeItem(CH);localStorage.removeItem(GR);toast('Всё сброшено! Обновите страницу.');setTimeout(function(){location.reload();},1500);}}};
 
-    // ===== NAVIGATION =====
-    function navigateTo(page) {
-        currentPage = page;
-        document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('active');});
-        var navItem = document.querySelector('[data-page="'+page+'"]');
-        if (navItem) navItem.classList.add('active');
-        
-        document.getElementById('sidebar').classList.toggle('hidden-mobile', page !== 'chats' && window.innerWidth <= 768);
-        document.getElementById('contactsPage').classList.toggle('show', page==='contacts');
-        document.getElementById('profilePage').classList.toggle('show', page==='profile');
-        document.getElementById('settingsPage').classList.toggle('show', page==='settings');
-        
-        if (page==='chats') renderChats();
-        if (page==='contacts') renderContacts();
-        if (page==='profile') renderProfile();
-        if (page==='settings') renderSettings();
-        
-        var titles = {chats:'💬 FuruGram', contacts:'👥 Контакты', profile:'👤 Профиль', settings:'⚙️ Настройки'};
-        document.getElementById('headerTitle').textContent = titles[page] || 'FuruGram';
-    }
+function navigate(page){
+    document.querySelectorAll('.nav-btn').forEach(function(b){b.classList.remove('active');});
+    document.querySelector('[data-page="'+page+'"]').classList.add('active');
+    var mc=document.getElementById('mainContent');
+    if(page==='dashboard')mc.innerHTML=renderDashboard();
+    else if(page==='users')mc.innerHTML=renderUsers();
+    else if(page==='stars')mc.innerHTML=renderStars();
+    else if(page==='premium')mc.innerHTML=renderPremium();
+    else if(page==='channels')mc.innerHTML=renderChannels();
+    else if(page==='groups')mc.innerHTML=renderGroups();
+    else if(page==='messages')mc.innerHTML=renderMessages();
+    else if(page==='settings')mc.innerHTML=renderSettings();
+}
 
-    document.querySelectorAll('.nav-item').forEach(function(n){
-        n.addEventListener('click',function(){navigateTo(n.dataset.page);});
-    });
+window.refresh=function(){
+    var active=document.querySelector('.nav-btn.active');
+    navigate(active?active.dataset.page:'dashboard');
+};
 
-    // ===== RENDER CHATS =====
-    function renderChats(){
-        if(!user)return;
-        var chats=allChats();
-        var q=(document.getElementById('searchInput').value||'').toLowerCase();
-        if(q)chats=chats.filter(function(c){return c.name.toLowerCase().indexOf(q)!==-1;});
-        var el=document.getElementById('chatList');
-        el.innerHTML='';
-        if(chats.length===0){el.innerHTML='<div style="text-align:center;padding:30px;color:var(--text-secondary);">Нет чатов</div>';return;}
-        chats.forEach(function(c){
-            var last=c.messages.length?c.messages[c.messages.length-1]:null;
-            var div=document.createElement('div');
-            div.className='chat-item'+(active===c.id?' active':'');
-            div.onclick=function(){openChat(c.id);};
-            var badge='';
-            if(c.type==='channel')badge='<span class="badge badge-channel">канал</span>';
-            if(c.type==='group')badge='<span class="badge badge-group">группа</span>';
-            var dot=(c.type==='personal'&&c.online)?'<span class="online-dot"></span>':'';
-            var avClass=(c.type==='channel'?' channel':c.type==='group'?' group':'')+(c.premium?' premium':'');
-            div.innerHTML=
-                '<div class="chat-avatar'+avClass+'">'+(c.avatar?'<img src="'+c.avatar+'">':c.initials)+dot+'</div>'+
-                '<div class="chat-body"><div class="chat-name">'+c.name+' '+badge+'</div><div class="chat-preview">'+(last?(last.text||'').substring(0,30):'Нет сообщений')+'</div></div>'+
-                '<div class="chat-meta">'+(c.unread>0?'<span class="unread">'+c.unread+'</span>':'')+'</div>';
-            el.appendChild(div);
-        });
-    }
+document.querySelectorAll('.nav-btn').forEach(function(b){
+    b.addEventListener('click',function(){navigate(b.dataset.page);});
+});
 
-    function openChat(cid){
-        active=cid;
-        var chats=allChats();
-        var c=chats.find(function(x){return x.id===cid;});
-        if(!c)return;
-        document.getElementById('emptyState').style.display='none';
-        document.getElementById('chatHead').style.display='flex';
-        document.getElementById('messages').style.display='flex';
-        document.getElementById('chatHeadName').textContent=c.name;
-        var av=document.getElementById('chatAvatar');
-        av.className='chat-avatar'+(c.type==='channel'?' channel':c.type==='group'?' group':'')+(c.premium?' premium':'');
-        av.innerHTML=c.avatar?'<img src="'+c.avatar+'">':c.initials;
-        if(c.type==='channel'){document.getElementById('chatHeadStatus').innerHTML='📢 '+c.subscribers+' подписчиков';document.getElementById('inputRow').style.display='none';}
-        else if(c.type==='group'){document.getElementById('chatHeadStatus').innerHTML='👥 '+c.members+' участников';document.getElementById('inputRow').style.display='flex';}
-        else{document.getElementById('chatHeadStatus').innerHTML=(c.online?'<span class="dot online"></span>онлайн':'<span class="dot offline"></span>оффлайн');document.getElementById('inputRow').style.display='flex';}
-        renderMessages(c);
-        if (window.innerWidth <= 768) document.getElementById('sidebar').classList.add('hidden-mobile');
-        var d=myData();if(d.messages&&d.messages[cid]){d.messages[cid].forEach(function(m){m.read=true;});saveMyData(d);}
-    }
-
-    function renderMessages(c){
-        var el=document.getElementById('messages');
-        el.innerHTML='';
-        var dd=document.createElement('div');dd.className='date-split';dd.innerHTML='<span>Сегодня</span>';el.appendChild(dd);
-        (c.messages||[]).forEach(function(m){
-            var div=document.createElement('div');div.className='msg '+(m.out?'out':'in');
-            var snd='';if((c.type==='group'||c.type==='channel')&&!m.out&&m.sender)snd='<div class="msg-sender">'+m.sender+'</div>';
-            div.innerHTML='<div class="msg-bubble">'+snd+(m.text||'')+'<div class="msg-time">'+(m.time||'')+'</div></div>';
-            el.appendChild(div);
-        });
-        el.scrollTop=el.scrollHeight;
-    }
-
-    function sendMsg(){
-        var text=document.getElementById('msgInput').value.trim();
-        if(!text||!active||!user)return;
-        var d=myData();if(!d.messages)d.messages={};if(!d.messages[active])d.messages[active]=[];
-        var now=new Date();var time=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
-        var msg={text:text,time:time,out:true,read:true,sender:user.name};
-        d.messages[active].push(msg);saveMyData(d);
-        document.getElementById('msgInput').value='';
-        var chats=allChats();var c=chats.find(function(x){return x.id===active;});if(c)renderMessages(c);
-        renderChats();
-        BC.postMessage({type:'msg',from:user.id,to:active,msg:msg,chatType:c?c.type:'personal'});
-    }
-
-    document.getElementById('sendBtn').addEventListener('click',sendMsg);
-    document.getElementById('msgInput').addEventListener('keypress',function(e){if(e.key==='Enter')sendMsg();});
-    document.getElementById('backBtn').addEventListener('click',function(){
-        active=null;
-        document.getElementById('emptyState').style.display='flex';
-        document.getElementById('chatHead').style.display='none';
-        document.getElementById('messages').style.display='none';
-        document.getElementById('inputRow').style.display='none';
-        if (window.innerWidth <= 768) document.getElementById('sidebar').classList.remove('hidden-mobile');
-    });
-
-    // ===== RENDER CONTACTS =====
-    function renderContacts(){
-        if(!user)return;
-        var d=myData(),users=getU(),el=document.getElementById('contactsPage');
-        var contacts=(d.contacts||[]).map(function(cid){return users[cid];}).filter(Boolean);
-        el.innerHTML='<h2 style="padding:16px;">Контакты</h2>';
-        if(contacts.length===0){el.innerHTML+='<p style="text-align:center;color:var(--text-secondary);padding:20px;">Нет контактов</p>';return;}
-        contacts.forEach(function(c){
-            var div=document.createElement('div');div.className='contact-item';
-            div.innerHTML='<div class="chat-avatar" style="width:44px;height:44px;font-size:0.9rem;">'+(c.avatar?'<img src="'+c.avatar+'">':c.name.charAt(0).toUpperCase())+(c.online?'<span class="online-dot"></span>':'')+'</div><div style="flex-grow:1;"><div style="font-weight:600;">'+c.name+'</div><div style="font-size:0.8rem;color:var(--text-secondary);">@'+c.username+'</div></div>';
-            div.onclick=function(){navigateTo('chats');setTimeout(function(){openChat(c.id);},200);};
-            el.appendChild(div);
-        });
-    }
-
-    // ===== RENDER PROFILE =====
-    function renderProfile(){
-        if(!user)return;
-        var el=document.getElementById('profilePage');
-        var posts = (myData().messages ? Object.values(myData().messages).reduce(function(s,m){return s+m.filter(function(x){return x.out;}).length;},0) : 0);
-        el.innerHTML =
-            '<div class="profile-header-card">'+
-            '<div class="profile-avatar-large'+(user.premium?' premium':'')+'" id="profileAvatarLarge" onclick="document.getElementById(\'avatarInput\').click()">'+(user.avatar?'<img src="'+user.avatar+'">':user.name.charAt(0).toUpperCase())+'</div>'+
-            '<div class="profile-name">'+user.name+(user.premium?' <span class="premium-star-lg">⭐</span>':'')+'</div>'+
-            '<div class="profile-username">@'+user.username+'</div>'+
-            (user.bio?'<div class="profile-bio">'+user.bio+'</div>':'')+
-            '<div class="profile-stats">'+
-            '<div class="profile-stat"><div class="profile-stat-num">'+(myData().contacts||[]).length+'</div><div class="profile-stat-label">Контакты</div></div>'+
-            '<div class="profile-stat"><div class="profile-stat-num">'+posts+'</div><div class="profile-stat-label">Публикации</div></div>'+
-            '<div class="profile-stat"><div class="profile-stat-num">'+(myData().channels||[]).length+(myData().groups||[]).length+'</div><div class="profile-stat-label">Каналы/Группы</div></div>'+
-            '</div></div>'+
-            
-            '<div class="profile-section">'+
-            '<div class="profile-section-title">Основное</div>'+
-            '<div class="profile-item" onclick="editField(\'name\',\'Имя\',\''+user.name+'\')"><i class="fas fa-user"></i><div class="item-content">Имя</div><div class="item-value">'+user.name+'</div><span class="arrow">›</span></div>'+
-            '<div class="profile-item" onclick="editField(\'username\',\'Юзернейм\',\''+user.username+'\')"><i class="fas fa-at"></i><div class="item-content">Юзернейм</div><div class="item-value">@'+user.username+'</div><span class="arrow">›</span></div>'+
-            '<div class="profile-item" onclick="editField(\'bio\',\'Био\',\''+(user.bio||'')+'\')"><i class="fas fa-info-circle"></i><div class="item-content">Био</div><div class="item-value">'+(user.bio||'Не указано')+'</div><span class="arrow">›</span></div>'+
-            '<div class="profile-item" onclick="editField(\'phone\',\'Телефон\',\''+(user.phone||'')+'\')"><i class="fas fa-phone"></i><div class="item-content">Телефон</div><div class="item-value">'+(user.phone||user.id.startsWith('+')?user.id:'Не указан')+'</div><span class="arrow">›</span></div>'+
-            '<div class="profile-item" onclick="editField(\'email\',\'Email\',\''+(user.type==='email'?user.id:'')+'\')"><i class="fas fa-envelope"></i><div class="item-content">Email</div><div class="item-value">'+(user.type==='email'?user.id:'Не указан')+'</div><span class="arrow">›</span></div>'+
-            '<div class="profile-item" onclick="editField(\'birthday\',\'Дата рождения\',\''+(user.birthday||'')+'\')"><i class="fas fa-birthday-cake"></i><div class="item-content">Дата рождения</div><div class="item-value">'+(user.birthday||'Не указана')+'</div><span class="arrow">›</span></div>'+
-            '</div>'+
-            
-            '<div class="profile-section">'+
-            '<div class="profile-section-title">Premium</div>'+
-            '<div class="profile-item" onclick="openPremiumModal()"><i class="fas fa-star" style="color:var(--premium);"></i><div class="item-content">FuruGram Premium</div><div class="item-value">'+(user.premium?'Активен':'Не активен')+'</div><span class="arrow">›</span></div>'+
-            '</div>'+
-            
-            '<div class="profile-section">'+
-            '<div class="profile-section-title">Аккаунт</div>'+
-            '<div class="profile-item" onclick="editField(\'password\',\'Пароль\',\'\')"><i class="fas fa-key"></i><div class="item-content">Сменить пароль</div><span class="arrow">›</span></div>'+
-            '<div class="profile-item danger" onclick="logout()"><i class="fas fa-sign-out-alt"></i><div class="item-content">Выйти</div><span class="arrow">›</span></div>'+
-            '</div>';
-    }
-
-    // ===== RENDER SETTINGS =====
-    function renderSettings(){
-        var el=document.getElementById('settingsPage');
-        el.innerHTML =
-            '<h2 style="padding:16px;">Настройки</h2>'+
-            '<div class="settings-item" onclick="toast(\'Уведомления: в разработке\')"><i class="fas fa-bell"></i><div class="item-content">Уведомления и звуки</div><span class="arrow" style="color:var(--text-muted);">›</span></div>'+
-            '<div class="settings-item" onclick="toast(\'Приватность: в разработке\')"><i class="fas fa-lock"></i><div class="item-content">Приватность и безопасность</div><span class="arrow" style="color:var(--text-muted);">›</span></div>'+
-            '<div class="settings-item"><i class="fas fa-palette"></i><div class="item-content">Тема оформления</div><div class="item-value">Тёмная</div></div>'+
-            '<div class="settings-item"><i class="fas fa-language"></i><div class="item-content">Язык</div><div class="item-value">Русский</div></div>'+
-            '<div class="settings-item" onclick="toast(\'Кэш очищен\')"><i class="fas fa-broom"></i><div class="item-content">Очистить кэш</div><span class="arrow" style="color:var(--text-muted);">›</span></div>'+
-            '<div class="settings-item"><i class="fas fa-info-circle"></i><div class="item-content">О приложении</div><div class="item-value">FuruGram v11.0</div></div>';
-    }
-
-    // ===== EDIT FIELD =====
-    window.editField = function(field, label, currentValue) {
-        var newVal = prompt(label + ':', currentValue);
-        if (newVal === null) return;
-        newVal = newVal.trim();
-        if (!newVal && field !== 'bio' && field !== 'birthday' && field !== 'phone') return;
-        
-        var users = getU();
-        
-        if (field === 'name') {
-            user.name = newVal;
-            users[user.id].name = newVal;
-        } else if (field === 'username') {
-            if (!/^[a-z0-9_]+$/.test(newVal)) { toast('Только латиница, цифры, _'); return; }
-            var taken = false;
-            for (var id in users) { if (users[id].username.toLowerCase() === newVal.toLowerCase() && id !== user.id) { taken = true; break; } }
-            if (taken) { toast('Юзернейм занят'); return; }
-            user.username = newVal;
-            users[user.id].username = newVal;
-        } else if (field === 'bio') {
-            user.bio = newVal;
-            users[user.id].bio = newVal;
-        } else if (field === 'phone') {
-            user.phone = newVal;
-            users[user.id].phone = newVal;
-        } else if (field === 'birthday') {
-            user.birthday = newVal;
-            users[user.id].birthday = newVal;
-        } else if (field === 'password') {
-            if (newVal.length < 3) { toast('Пароль от 3 символов'); return; }
-            user.password = newVal;
-            users[user.id].password = newVal;
-            setS(user);
-        }
-        
-        setU(users);
-        renderProfile();
-        toast(label + ' обновлено!');
-    };
-
-    window.openPremiumModal = function() {
-        document.getElementById('premiumModal').classList.add('show');
-        updatePremiumButtons();
-    };
-
-    function updatePremiumButtons() {
-        var activateBtn = document.getElementById('activatePremiumBtn');
-        var cancelBtn = document.getElementById('cancelPremiumBtn');
-        if (user && user.premium) {
-            activateBtn.style.display = 'none';
-            cancelBtn.style.display = 'block';
-        } else {
-            activateBtn.style.display = 'block';
-            cancelBtn.style.display = 'none';
-        }
-    }
-
-    window.logout = function() {
-        var u = getU();
-        if (u[user.id]) { u[user.id].online = false; setU(u); }
-        user = null; active = null;
-        setS(null);
-        location.reload();
-    };
-
-    // ===== CREATE =====
-    document.getElementById('createBtn').addEventListener('click',function(){document.getElementById('createModal').classList.add('show');});
-    document.getElementById('createClose').addEventListener('click',function(){document.getElementById('createModal').classList.remove('show');});
-    document.getElementById('createChannelTab').addEventListener('click',function(){createType='channel';this.style.background='var(--accent)';document.getElementById('createGroupTab').style.background='var(--surface2)';});
-    document.getElementById('createGroupTab').addEventListener('click',function(){createType='group';this.style.background='var(--accent)';document.getElementById('createChannelTab').style.background='var(--surface2)';});
-    document.getElementById('createSubmitBtn').addEventListener('click',function(){
-        var name=document.getElementById('createName').value.trim();
-        if(!name){document.getElementById('createError').textContent='Введите название';document.getElementById('createError').classList.add('show');return;}
-        var nid=genId();var d=myData();
-        if(createType==='channel'){var chs=getCh();chs[nid]={id:nid,name:name,desc:document.getElementById('createDesc').value.trim(),creatorId:user.id,subscribers:1};setCh(chs);if(!d.channels)d.channels=[];d.channels.push(nid);toast('📢 Канал создан!');}
-        else{var grs=getGr();grs[nid]={id:nid,name:name,desc:document.getElementById('createDesc').value.trim(),creatorId:user.id,members:1};setGr(grs);if(!d.groups)d.groups=[];d.groups.push(nid);toast('👥 Группа создана!');}
-        if(!d.messages)d.messages={};d.messages[nid]=[];saveMyData(d);
-        document.getElementById('createModal').classList.remove('show');renderChats();
-    });
-
-    // ===== PREMIUM =====
-    document.getElementById('premiumBtn').addEventListener('click',function(){
-        document.getElementById('premiumModal').classList.add('show');
-        updatePremiumButtons();
-    });
-    document.getElementById('premiumClose').addEventListener('click',function(){document.getElementById('premiumModal').classList.remove('show');});
-    
-    document.getElementById('activatePremiumBtn').addEventListener('click',function(){
-        if(!user)return;
-        var u=getU();u[user.id].premium=true;setU(u);user.premium=true;
-        document.getElementById('premiumModal').classList.remove('show');
-        updatePremiumButtons();
-        showPremiumAnimation();
-        renderProfile();
-        toast('⭐ Premium активирован!');
-    });
-    
-    document.getElementById('cancelPremiumBtn').addEventListener('click',function(){
-        if(!user)return;
-        if(confirm('Отменить Premium подписку?')) {
-            var u=getU();u[user.id].premium=false;setU(u);user.premium=false;
-            document.getElementById('premiumModal').classList.remove('show');
-            updatePremiumButtons();
-            renderProfile();
-            toast('Premium отменён');
-        }
-    });
-
-    // ===== AVATAR UPLOAD =====
-    document.getElementById('avatarInput').addEventListener('change', function(e) {
-        var file = e.target.files[0];
-        if (!file) return;
-        var reader = new FileReader();
-        reader.onload = function(ev) {
-            user.avatar = ev.target.result;
-            var users = getU();
-            users[user.id].avatar = user.avatar;
-            setU(users);
-            renderProfile();
-            toast('📷 Фото обновлено!');
-        };
-        reader.readAsDataURL(file);
-    });
-
-    // ===== SEARCH =====
-    document.getElementById('searchInput').addEventListener('input',function(){
-        var q=this.value.trim().toLowerCase();
-        if(q.length>=2){var users=getU();for(var id in users){if(id!==user.id&&(users[id].username.toLowerCase().indexOf(q)!==-1||users[id].name.toLowerCase().indexOf(q)!==-1)){if(addContact(id)){toast('✅ '+users[id].name+' добавлен!');renderChats();}break;}}}
-        renderChats();
-    });
-
-    // ===== BC =====
-    BC.onmessage=function(e){
-        var d=e.data;if(!user)return;
-        if(d.type==='msg'){var data=myData();if(!data.messages)data.messages={};var target=null;
-            if(d.chatType==='personal'&&d.to===user.id){target=d.from;if(!data.contacts)data.contacts=[];if(data.contacts.indexOf(d.from)===-1)data.contacts.push(d.from);}
-            else if((d.chatType==='channel'||d.chatType==='group')&&d.from!==user.id){var my=(d.chatType==='channel'?data.channels:data.groups)||[];if(my.indexOf(d.to)!==-1)target=d.to;}
-            if(target&&d.from!==user.id){if(!data.messages[target])data.messages[target]=[];data.messages[target].push({text:d.msg.text,time:d.msg.time,out:false,read:false,sender:d.msg.sender});saveMyData(data);
-                if(active===target){var chats=allChats();var c=chats.find(function(x){return x.id===target;});if(c)renderMessages(c);}renderChats();}}
-        if(d.type==='online'){var u=getU();if(u[d.id]){u[d.id].online=true;setU(u);}renderChats();}
-    };
-
-    // ===== AUTO LOGIN =====
-    (function(){
-        var s=getS();if(s){var u=getU();if(u[s.id]&&u[s.id].password===s.password){u[s.id].online=true;setU(u);user=u[s.id];navigateTo('chats');}}
-    })();
-
-    // ===== INIT =====
-    navigateTo('chats');
-    console.log('🚀 FuruGram v11.0 - Telegram × Max');
-    console.log('👤 Профиль с аватаркой, юзернеймом, телефоном, почтой, датой рождения');
-    console.log('⭐ Premium с анимацией и отменой');
+// Auth
+var password=prompt('🔐 Введите пароль администратора:','admin123');
+if(password!=='admin123'){
+    document.body.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-size:1.2rem;color:var(--text-secondary);">❌ Доступ запрещён. Обновите страницу.</div>';
+} else {
+    navigate('dashboard');
+}
+console.log('👑 FuruGram Admin Panel v24.0');
+console.log('📊 Дашборд | 👥 Пользователи | ⭐ Звёзды | 👑 Premium | 📢 Каналы | 👥 Группы | 💬 Сообщения | 🔧 Настройки');
 })();
 </script>
 </body>
