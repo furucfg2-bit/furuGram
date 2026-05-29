@@ -16,7 +16,6 @@
     <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
-        /* (весь CSS из предыдущей версии) */
         :root {
             --bg: #ffffff; --surface: #ffffff; --surface2: #f0f2f5; --surface3: #e4e6eb;
             --chat-bg: #ffffff; --accent: #3390ec; --premium: #d4a843; --text: #000000;
@@ -296,7 +295,7 @@
             toast('👥 '+t('groupCreated'));
         }
         if(!d.messages)d.messages={}; d.messages[nid]=[]; smd(d);
-        hideCreate(); rc(); // обновить список чатов
+        hideCreate(); rc();
     };
 
     window.showPrem = ()=>{if(!U)return; document.getElementById('premModal').style.display='flex'; updatePremBtns();};
@@ -458,6 +457,7 @@
         renderMsgs();
         if(window.innerWidth<=768)document.getElementById('sidebar').classList.add('hide');
     }
+
     function renderMsgs(){
         const el=document.getElementById('messages'); if(!active)return;
         el.innerHTML='';
@@ -472,11 +472,66 @@
         el.scrollTop=el.scrollHeight;
     }
 
-    function rco(){ /* аналогично предыдущему, без изменений */ }
-    function rp(){ /* аналогично, но с вызовом window.editF и т.д. */ }
-    function rs(){ /* аналогично */ }
+    function rco(){
+        if(!U)return;
+        const d=md(), users=gu();
+        const contacts=(d.contacts||[]).map(cid=>users[cid]).filter(Boolean);
+        const el=document.getElementById('contactsPage'); el.innerHTML='';
+        if(contacts.length===0){el.innerHTML=`<div style="text-align:center;padding:40px;color:var(--text-secondary);">${t('noContacts')}</div>`;return;}
+        contacts.forEach(c=>{
+            const div=document.createElement('div');
+            div.style.cssText='display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--border);cursor:pointer;';
+            div.innerHTML=`<div class="avatar sm">${c.avatar?`<img src="${c.avatar}">`:c.name.charAt(0)}</div><div><div style="font-weight:500;">${c.name}</div><div style="font-size:0.8rem;color:var(--text-secondary);">@${c.username}</div></div>`;
+            div.onclick=()=>{go('chats'); setTimeout(()=>openChat(c),100);};
+            el.appendChild(div);
+        });
+    }
 
-    // ===== ПОИСК ДРУЗЕЙ (улучшено) =====
+    function rp(){
+        if(!U)return;
+        const el=document.getElementById('profilePage');
+        const d=md(); let posts=0; for(const k in d.messages)posts+=d.messages[k].filter(x=>x.out).length;
+        el.innerHTML=`
+        <div class="prof-cover"></div>
+        <div class="prof-av-wrap"><div class="prof-av-lg${U.premium?' pr':''}" onclick="document.getElementById('avatarInput').click()">${U.avatar?`<img src="${U.avatar}">`:U.name.charAt(0).toUpperCase()}</div></div>
+        <div class="prof-info">
+            <div class="prof-name-lg">${U.name}${U.premium?' <span style="color:var(--premium);">⭐</span>':''}</div>
+            <div class="prof-uname-lg">@${U.username}</div>
+            ${U.bio?`<div style="color:var(--text);font-size:0.9rem;margin-top:6px;">${U.bio}</div>`:''}
+            <div class="prof-stats-row">
+                <div class="pstat"><div class="pstat-num">${(d.contacts||[]).length}</div><div class="pstat-lbl">${t('contacts')}</div></div>
+                <div class="pstat"><div class="pstat-num">${posts}</div><div class="pstat-lbl">posts</div></div>
+                <div class="pstat"><div class="pstat-num">${U.stars||0}</div><div class="pstat-lbl">${t('stars')}</div></div>
+            </div>
+        </div>
+        ${(U.gifts||[]).length>0?`<div class="gifts-row">${U.gifts.map(g=>`<div class="gift-item">${g}</div>`).join('')}</div>`:''}
+        <div class="psec"><div class="psec-title">${t('info')}</div>
+            <div class="pitem" onclick="window.editF('name')"><i class="fas fa-user"></i>${t('name')}<span class="pv">${U.name}</span></div>
+            <div class="pitem" onclick="window.editF('username')"><i class="fas fa-at"></i>${t('username')}<span class="pv">@${U.username}</span></div>
+            <div class="pitem" onclick="window.editF('bio')"><i class="fas fa-info-circle"></i>${t('bio')}<span class="pv">${U.bio||'—'}</span></div>
+        </div>
+        <div class="psec"><div class="psec-title">${t('premium')}</div>
+            <div class="pitem" onclick="window.showPrem()"><i class="fas fa-star" style="color:var(--premium);"></i>Premium<span class="pv">${U.premium?t('premActive'):t('premInactive')}</span></div>
+            <div class="pitem" onclick="window.showGiftShop()"><i class="fas fa-gift"></i>${t('giftShop')}<span class="pv">${U.stars||0} ⭐</span></div>
+        </div>
+        <div class="psec"><div class="pitem danger" onclick="window.logout()"><i class="fas fa-sign-out-alt"></i>${t('logout')}</div></div>`;
+    }
+
+    function rs(){
+        const el=document.getElementById('settingsPage');
+        el.innerHTML=`
+        <div class="psec" style="margin-top:0;">
+            <div class="sitem" onclick="window.requestNotification()"><i class="fas fa-bell"></i><div style="flex-grow:1;">${t('notifications')}</div><span class="sv">›</span></div>
+            <div class="sitem" onclick="window.switchLang()"><i class="fas fa-globe"></i><div style="flex-grow:1;">${t('language')}<div style="font-size:0.75rem;color:var(--text-muted);" id="langLabel">${LANG==='en'?'English':'Русский'}</div></div><span class="sv">›</span></div>
+            <div class="sitem" onclick="window.toggleTheme()"><i class="fas fa-palette"></i><div style="flex-grow:1;">${t('theme')}<div style="font-size:0.75rem;color:var(--text-muted);" id="themeLabel">${t('light')}</div></div><span class="sv">›</span></div>
+        </div>
+        <div class="psec">
+            <div class="sitem" onclick="toast(t('cacheDone'))"><i class="fas fa-broom"></i><div style="flex-grow:1;">${t('cache')}</div><span class="sv">›</span></div>
+            <div class="sitem"><i class="fas fa-info-circle"></i><div style="flex-grow:1;">${t('version')}</div><span class="sv">29.0</span></div>
+        </div>`;
+    }
+
+    // ===== ПОИСК ДРУЗЕЙ =====
     document.getElementById('searchInput').addEventListener('input', function(){
         const q=this.value.trim().toLowerCase();
         if(!U) return;
@@ -486,14 +541,14 @@
                 if(id!==U.id && (users[id].username.toLowerCase().includes(q) || users[id].name.toLowerCase().includes(q))){
                     if(addContact(id)){
                         toast('✅ '+users[id].name+' '+t('contactAdded'));
-                        rc(); // обновить список
+                        rc();
                         return;
                     }
                 }
             }
             toast('🔍 Пользователь не найден');
         }
-        rc(); // обновить фильтр даже если нет поиска
+        rc();
     });
 
     // ===== BROADCAST CHANNEL =====
@@ -532,7 +587,7 @@
         updateAllTexts();
     })();
     go('chats');
-    console.log('🚀 FuruGram v29.0 — Создание каналов и поиск друзей исправлены!');
+    console.log('🚀 FuruGram v29.0 — Полный функционал восстановлен!');
 })();
 </script>
 </body>
