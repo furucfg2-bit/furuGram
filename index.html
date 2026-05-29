@@ -16,7 +16,6 @@
     <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
-        /* полный Telegram-стиль */
         :root {
             --bg: #ffffff; --surface: #ffffff; --surface2: #f0f2f5; --surface3: #e4e6eb;
             --chat-bg: #ffffff; --accent: #3390ec; --premium: #d4a843; --text: #000000;
@@ -60,6 +59,8 @@
         .avatar { width:48px; height:48px; border-radius:50%; background:var(--accent); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:1.2rem; color:white; flex-shrink:0; overflow:hidden; position:relative; background-size:cover; background-position:center; }
         .avatar img { width:100%; height:100%; object-fit:cover; }
         .avatar.sm { width:38px; height:38px; font-size:0.9rem; }
+        .avatar.lg { width:80px; height:80px; font-size:2rem; }
+        .avatar.pr { border:2px solid var(--premium); box-shadow:0 0 12px rgba(212,168,67,0.3); }
         .online-dot { position:absolute; bottom:1px; right:1px; width:11px; height:11px; background:var(--online); border-radius:50%; border:2px solid var(--surface); }
         .cbody { flex-grow:1; min-width:0; }
         .cname { font-weight:500; font-size:0.95rem; }
@@ -156,10 +157,7 @@
             <div class="empty" id="emptyState"><i class="fas fa-comments" style="font-size:3.5rem;opacity:0.12;"></i><h3>FuruGram</h3><p id="emptyText">Выберите чат</p></div>
             <div class="chat-head" id="chatHead" style="display:none;"><button class="back-btn" onclick="window.closeChat()"><i class="fas fa-arrow-left"></i></button><div class="avatar sm" id="chatAv">A</div><div><div class="cname" id="chatNm"></div><div style="font-size:0.75rem;color:var(--text-secondary);" id="chatSt"></div></div></div>
             <div class="msgs" id="messages" style="display:none;"></div>
-            <div class="input-row" id="inputRow" style="display:none;">
-                <input type="text" placeholder="Сообщение..." id="msgInput">
-                <button class="send-btn" onclick="window.sendMsg()"><i class="fas fa-paper-plane"></i></button>
-            </div>
+            <div class="input-row" id="inputRow" style="display:none;"><input type="text" placeholder="Сообщение..." id="msgInput"><button class="send-btn" onclick="window.sendMsg()"><i class="fas fa-paper-plane"></i></button></div>
         </div>
         <div class="page" id="contactsPage"></div>
         <div class="page" id="profilePage"></div>
@@ -173,7 +171,6 @@
     </div>
 </div>
 
-<!-- экран входа -->
 <div class="login-screen" id="loginScreen">
     <div class="login-card">
         <h2 style="text-align:center;font-size:1.5rem;margin-bottom:4px;">🔐 FuruGram</h2>
@@ -188,7 +185,6 @@
     </div>
 </div>
 
-<!-- модальные окна -->
 <div id="createModal" style="display:none;" class="modal-bg"><div class="modal-card"><h3 id="createTitle">✨ Создать</h3><div class="field"><label id="lblCreateName">Название</label><input type="text" id="cname"></div><button class="btn btn-p" onclick="window.doCreate('channel')" style="width:100%;">📢 <span id="btnChannel">Канал</span></button><button class="btn" onclick="window.doCreate('group')" style="width:100%;background:#4caf50;color:white;margin-top:8px;">👥 <span id="btnGroup">Группа</span></button><button class="btn btn-o" onclick="window.hideCreate()" style="width:100%;"><span id="btnCancel">Отмена</span></button></div></div>
 
 <div id="premModal" style="display:none;" class="modal-bg"><div class="modal-card"><h3>⭐ FuruGram Premium</h3><p style="text-align:center;color:var(--text-secondary);margin-bottom:16px;" id="premDesc">Эксклюзивные возможности</p><button class="btn" id="actPremBtn" onclick="window.activatePrem()" style="width:100%;background:linear-gradient(135deg,#d4a843,#f0c860);color:#1a1a2e;font-weight:700;font-size:1rem;padding:15px;">⭐ <span id="btnActivate">Активировать бесплатно</span></button><button class="btn" id="cancelPremBtn" onclick="window.cancelPrem()" style="width:100%;background:var(--danger);color:white;display:none;margin-top:8px;"><span id="btnCancelPrem">Отменить Premium</span></button><button class="btn btn-o" onclick="window.hidePrem()" style="width:100%;"><span id="btnClose">Закрыть</span></button></div></div>
@@ -469,13 +465,9 @@
         if(!U)return;
         const query=(document.getElementById('searchInput').value||'').toLowerCase();
         const chats=allChats();
-        // поиск по чатам (контакты, каналы, группы)
         let filtered=chats.filter(c=>c.name.toLowerCase().includes(query)||(c.username||'').toLowerCase().includes(query));
-        const el=document.getElementById('chatList'); el.innerHTML='';
-        if(!query&&filtered.length===0){el.innerHTML=`<div style="text-align:center;padding:40px;color:var(--text-secondary);">${t('noChats')}</div>`;return;}
-        // если есть поисковый запрос, также ищем пользователей вне контактов и каналы/группы вне подписок
         if(query.length>=2){
-            const users=gu(); const chs=gc(); const grs=gg();
+            const users=gu(), chs=gc(), grs=gg();
             // пользователи не в контактах
             for(const id in users){
                 if(id===U.id)continue;
@@ -499,14 +491,20 @@
                 }
             }
         }
+        const el=document.getElementById('chatList'); el.innerHTML='';
         if(filtered.length===0){el.innerHTML=`<div style="text-align:center;padding:40px;color:var(--text-secondary);">${t('noChats')}</div>`;return;}
         filtered.forEach(c=>{
             const div=document.createElement('div'); div.className='chat-item';
             div.onclick=()=>{
                 if(c.isNew){
                     if(c.type==='personal'){addContact(c.id);toast('✅ '+c.name+' '+t('contactAdded'));}
-                    else if(c.type==='channel'){if(!md().channels.includes(c.id)){const d=md();d.channels.push(c.id);smd(d);}window.subscribeToChannel(c.id);}
-                    else if(c.type==='group'){if(!md().groups.includes(c.id)){const d=md();d.groups.push(c.id);smd(d);}window.joinGroup(c.id);}
+                    else if(c.type==='channel'){
+                        if(!md().channels.includes(c.id)){const d=md();d.channels.push(c.id);smd(d);}
+                        window.subscribeToChannel(c.id);
+                    }else if(c.type==='group'){
+                        if(!md().groups.includes(c.id)){const d=md();d.groups.push(c.id);smd(d);}
+                        window.joinGroup(c.id);
+                    }
                     rc();
                 }else{openChat(c);}
             };
@@ -518,12 +516,151 @@
         });
     }
 
-    function openChat(c){ /* как и раньше, без изменений */ }
+    function openChat(c){
+        active=c.id;
+        document.getElementById('emptyState').style.display='none';
+        document.getElementById('chatHead').style.display='flex';
+        document.getElementById('messages').style.display='flex';
+        document.getElementById('inputRow').style.display='flex';
+        document.getElementById('chatNm').textContent=c.name;
+        const av=document.getElementById('chatAv'); av.className='avatar sm';
+        av.innerHTML=c.avatar?`<img src="${c.avatar}">`:c.initials;
+        let statusHtml='';
+        if(c.type==='channel'){
+            statusHtml=`📢 ${c.subscribers.length} подписчиков <button onclick="window.subscribeToChannel('${c.id}')" style="background:var(--accent);color:white;border:none;border-radius:12px;padding:4px 10px;font-size:0.75rem;margin-left:8px;">${c.subscribers.includes(U.id)?t('unsubscribe'):t('subscribe')}</button>`;
+            document.getElementById('inputRow').style.display='none';
+        }else if(c.type==='group'){
+            statusHtml=`👥 ${c.members.length} участников <button onclick="window.joinGroup('${c.id}')" style="background:var(--accent);color:white;border:none;border-radius:12px;padding:4px 10px;font-size:0.75rem;margin-left:8px;">${c.members.includes(U.id)?t('leaveGroup'):t('joinGroup')}</button>`;
+            document.getElementById('inputRow').style.display='flex';
+        }else{
+            statusHtml=(c.online?'<span class="dot on"></span>'+t('online'):'<span class="dot off"></span>'+t('offline'));
+            document.getElementById('inputRow').style.display='flex';
+        }
+        document.getElementById('chatSt').innerHTML=statusHtml;
+        renderMsgs();
+        if(window.innerWidth<=768)document.getElementById('sidebar').classList.add('hide');
+    }
 
-    // Остальные функции rco, rp, rs и т.д. (как в предыдущей полной версии)
+    function renderMsgs(){
+        const el=document.getElementById('messages'); if(!active)return;
+        el.innerHTML='';
+        const dd=document.createElement('div'); dd.className='dsep'; dd.innerHTML=`<span>${t('today')}</span>`; el.appendChild(dd);
+        const d=md(); const msgs=d.messages&&d.messages[active]?d.messages[active]:[];
+        msgs.forEach(m=>{
+            const div=document.createElement('div'); div.className='msg '+(m.out?'out':'in');
+            let content=''; if(m.type==='sticker')content=`<span class="msg-sticker">${m.text}</span>`; else content=m.text;
+            let sender=''; if((getActiveChatType()==='group'||getActiveChatType()==='channel')&&!m.out)sender=`<div style="font-weight:600;color:var(--accent);">${m.sender}</div>`;
+            div.innerHTML=`<div class="mbub">${sender}${content}<div class="mtime">${m.time}</div></div>`;
+            el.appendChild(div);
+        });
+        el.scrollTop=el.scrollHeight;
+    }
 
-    // Инициализация
-    // ...
+    function rco(){
+        if(!U)return;
+        const d=md(), users=gu();
+        const contacts=(d.contacts||[]).map(cid=>users[cid]).filter(Boolean);
+        const el=document.getElementById('contactsPage'); el.innerHTML='';
+        if(contacts.length===0){el.innerHTML=`<div style="text-align:center;padding:40px;color:var(--text-secondary);">${t('noChats')}</div>`;return;}
+        contacts.forEach(c=>{
+            const div=document.createElement('div');
+            div.style.cssText='display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--border);cursor:pointer;';
+            div.innerHTML=`<div class="avatar sm">${c.avatar?`<img src="${c.avatar}">`:c.name.charAt(0)}</div><div style="flex-grow:1;"><div style="font-weight:500;">${c.name} ${c.premium?c.premiumEmoji||'⭐':''}</div><div style="font-size:0.8rem;color:var(--text-secondary);">@${c.username}${c.nftUsername?' | '+c.nftUsername:''}</div></div><button onclick="event.stopPropagation();window.showGiftSendModal('${c.id}')" style="background:var(--premium);color:white;border:none;border-radius:12px;padding:4px 10px;">🎁</button>`;
+            div.onclick=()=>{go('chats'); setTimeout(()=>openChat(c),100);};
+            el.appendChild(div);
+        });
+    }
+
+    function rp(){
+        if(!U)return;
+        const el=document.getElementById('profilePage');
+        const d=md(); let posts=0; for(const k in d.messages)posts+=d.messages[k].filter(x=>x.out).length;
+        el.innerHTML=`
+        <div class="prof-cover"></div>
+        <div class="prof-av-wrap"><div class="prof-av-lg${U.premium?' pr':''}" onclick="document.getElementById('avatarInput').click()">${U.avatar?`<img src="${U.avatar}">`:U.name.charAt(0).toUpperCase()}</div></div>
+        <div class="prof-info">
+            <div class="prof-name-lg">${U.name}${U.premium?` <span>${U.premiumEmoji||'⭐'}</span>`:''}</div>
+            ${U.nftUsername?`<div class="nft-username">@${U.nftUsername}</div>`:''}
+            <div class="prof-uname-lg">@${U.username}</div>
+            ${U.bio?`<div class="prof-bio-lg">${U.bio}</div>`:''}
+        </div>
+        ${(U.gifts||[]).length>0?`<div class="gifts-row">${U.gifts.map(g=>`<div class="gift-item">${g}</div>`).join('')}</div>`:''}
+        <div class="psec"><div class="psec-title">${t('info')}</div>
+            <div class="pitem" onclick="window.editF('name')"><i class="fas fa-user"></i>${t('name')}<span class="pv">${U.name}</span></div>
+            <div class="pitem" onclick="window.editF('username')"><i class="fas fa-at"></i>${t('username')}<span class="pv">@${U.username}</span></div>
+            ${U.premium?`<div class="pitem" onclick="window.editF('nftUsername')"><i class="fas fa-link"></i>${t('nftUsername')}<span class="pv">${U.nftUsername||'—'}</span></div>`:''}
+            <div class="pitem" onclick="window.editF('bio')"><i class="fas fa-info-circle"></i>${t('bio')}<span class="pv">${U.bio||'—'}</span></div>
+        </div>
+        <div class="psec"><div class="psec-title">${t('premium')}</div>
+            <div class="pitem" onclick="window.showPrem()"><i class="fas fa-star" style="color:var(--premium);"></i>Premium<span class="pv">${U.premium?t('premActive'):t('premInactive')}</span></div>
+            ${U.premium?`<div class="pitem" onclick="changeEmoji()"><i class="fas fa-smile"></i>${t('premiumEmoji')}<span class="pv">${U.premiumEmoji||'⭐'}</span></div>`:''}
+        </div>
+        <div class="psec"><div class="pitem danger" onclick="window.logout()"><i class="fas fa-sign-out-alt"></i>${t('logout')}</div></div>`;
+    }
+
+    window.changeEmoji = function(){
+        if(!U||!U.premium)return;
+        const emoji=prompt('Выберите эмодзи (например, 😎, 🥳, 💎):', U.premiumEmoji||'⭐');
+        if(emoji&&emoji.trim()){
+            U.premiumEmoji=emoji.trim();
+            const users=gu(); users[U.id].premiumEmoji=U.premiumEmoji; su(users);
+            rp(); toast('Эмодзи обновлён!');
+        }
+    };
+
+    function rs(){
+        const el=document.getElementById('settingsPage');
+        el.innerHTML=`
+        <div class="psec" style="margin-top:0;">
+            <div class="sitem" onclick="window.requestNotification()"><i class="fas fa-bell"></i><div style="flex-grow:1;">${t('notifications')}</div><span class="sv">›</span></div>
+            <div class="sitem" onclick="window.switchLang()"><i class="fas fa-globe"></i><div style="flex-grow:1;">${t('language')}<div style="font-size:0.75rem;color:var(--text-muted);" id="langLabel">${LANG==='en'?'English':'Русский'}</div></div><span class="sv">›</span></div>
+            <div class="sitem" onclick="window.toggleTheme()"><i class="fas fa-palette"></i><div style="flex-grow:1;">${t('theme')}<div style="font-size:0.75rem;color:var(--text-muted);" id="themeLabel">${t('light')}</div></div><span class="sv">›</span></div>
+            <div class="sitem" onclick="window.showPrem()"><i class="fas fa-star" style="color:var(--premium);"></i>Premium</div>
+            <div class="sitem" onclick="window.showGiftShop()"><i class="fas fa-gift"></i>${t('giftShop')}</div>
+            <div class="sitem" onclick="window.showStickerModal()"><i class="fas fa-smile"></i>Создать стикер</div>
+            <div class="sitem" onclick="toast(t('cacheDone'))"><i class="fas fa-broom"></i>${t('cache')}</div>
+            <div class="sitem"><i class="fas fa-info-circle"></i>${t('version')}<span class="sv">31.0</span></div>
+        </div>`;
+    }
+
+    document.getElementById('searchInput').addEventListener('input', rc);
+    document.getElementById('avatarInput').addEventListener('change',function(e){
+        const f=e.target.files[0]; if(!f)return;
+        const r=new FileReader();
+        r.onload=function(ev){U.avatar=ev.target.result; const users=gu(); users[U.id].avatar=U.avatar; su(users); rp(); toast('📷 '+t('avatarUpdated'));};
+        r.readAsDataURL(f);
+    });
+
+    BC.onmessage=function(e){
+        const d=e.data; if(!U)return;
+        if(d.type==='msg'){
+            const data=md(); if(!data.messages)data.messages={};
+            let target=null;
+            if(d.chatType==='personal'&&d.to===U.id){
+                target=d.from; if(!data.contacts)data.contacts=[]; if(!data.contacts.includes(d.from))data.contacts.push(d.from);
+            }else if((d.chatType==='channel'||d.chatType==='group')&&d.from!==U.id){
+                target=d.to;
+            }
+            if(target&&d.from!==U.id){
+                if(!data.messages[target])data.messages[target]=[];
+                data.messages[target].push({text:d.msg.text,time:d.msg.time,out:false,read:false,sender:d.msg.sender,type:d.msg.type||'text'});
+                smd(data);
+                if(active===target)renderMsgs();
+                rc();
+                if(Notification.permission==='granted'){new Notification('FuruGram',{body:'Новое сообщение от '+d.msg.sender});}
+            }
+        }
+    };
+
+    (function(){
+        const savedLang=localStorage.getItem('fg_lang'); if(savedLang)LANG=savedLang;
+        const theme=localStorage.getItem('fg_theme'); if(theme==='dark'){document.body.classList.add('dark');}
+        const s=gs(); if(s&&s.id){const users=gu(); if(users[s.id]&&users[s.id].password===s.password){U=users[s.id]; U.online=true; su(users); document.getElementById('loginScreen').style.display='none'; go('chats'); return;}}
+        document.getElementById('loginScreen').style.display='flex';
+        updateAllTexts();
+    })();
+    go('chats');
+    console.log('🚀 FuruGram v31 — поиск друзей и каналов работает!');
 })();
 </script>
 </body>
